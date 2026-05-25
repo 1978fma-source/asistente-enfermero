@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Estación Clínica de Guardia · by Fernando</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap');
+  
+  *{box-sizing:border-box;margin:0;padding:0}
+  
+  :root{
+    --bg:#050814;--sf:#0c122c;--sf2:#141d47;--inp:#1b265c;
+    --bdr:#26357a;--bdr2:#3a50b0;--txt:#e2e8f0;--txt2:#94a3b8;--acc:#3b82f6;
+    --usr:#0c1e45;
+    --c1:#ef4444;--b1:rgba(239,68,68,.15);
+    --c2:#10b981;--b2:rgba(16,185,129,.15);
+    --c3:#f59e0b;--b3:rgba(245,158,11,.15);
+    --c4:#f87171;
+    --font-sans: 'Inter', sans-serif;
+    --font-display: 'Syne', sans-serif;
+  }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--txt);
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  header {
+    background: var(--sf);
+    border-bottom: 1px solid var(--bdr);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 110;
+    flex-shrink: 0;
+    height: 56px;
+  }
+
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .logo { font-size: 20px; }
+  .title-box h1 { font-family: var(--font-display); font-size: 15px; font-weight: 800; letter-spacing: -0.5px; color: #fff; }
+  .title-box p { font-size: 10px; color: var(--acc); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+  
+  .status-area { display: flex; align-items: center; gap: 12px; }
+  .sdot { width: 10px; height: 10px; border-radius: 50%; background: #475569; transition: background 0.3s; }
+  .dok { background: #10b981; box-shadow: 0 0 8px #10b981; }
+  .dwarn { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+  .derr { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+
+  .btn-top {
+    background: var(--sf2); border: 1px solid var(--bdr); color: #fff; padding: 6px 12px; border-radius: 6px;
+    font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;
+    transition: all 0.15s; user-select: none;
+  }
+  .btn-top:hover { background: var(--bdr); border-color: var(--bdr2); }
+  
+  .banner-key {
+    background: rgba(245,158,11,0.1); border-bottom: 1px solid rgba(245,158,11,0.25);
+    padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    z-index: 105; flex-shrink: 0;
+  }
+  .banner-key.hidden { display: none; }
+  .banner-txt { font-size: 12px; color: #fcd34d; display: flex; align-items: center; gap: 6px; }
+  .banner-form { display: flex; gap: 8px; flex-grow: 1; max-width: 400px; }
+  .banner-form input {
+    background: rgba(0,0,0,0.3); border: 1px solid rgba(245,158,11,0.4); border-radius: 4px;
+    padding: 4px 8px; color: #fff; font-size: 12px; flex-grow: 1; font-family: monospace;
+  }
+  .banner-form button { background: #f59e0b; border: none; color: #000; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 700; cursor: pointer; }
+  
+  .key-settings { display: none; align-items: center; gap: 8px; font-size: 11px; color: var(--txt2); }
+  .key-settings.show { display: flex; }
+  .btn-change-key { background: none; border: none; color: #f87171; text-decoration: underline; cursor: pointer; font-size: 11px; padding: 0 2px; }
+
+  .main-container {
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: calc(100% - 56px);
+    overflow: hidden;
+  }
+
+  .chat-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    background: radial-gradient(circle at top right, rgba(12,18,44,0.5), transparent);
+    overflow: hidden;
+  }
+
+  .msgs-box {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .welcome { max-width: 500px; margin: 30px auto; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; animation: fadeIn 0.4s ease; }
+  .welcome strong { font-family: var(--font-display); font-size: 20px; color: #fff; letter-spacing: -0.5px; }
+  .welcome em { font-style: normal; font-size: 11px; color: var(--txt2); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .welcome p { font-size: 13px; color: var(--txt2); margin-top: 4px; }
+  
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; max-width: 400px; }
+  .chip { background: var(--sf); border: 1px solid var(--bdr); padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: all 0.15s; color: var(--txt); }
+  .chip:hover { border-color: var(--bdr2); background: var(--sf2); transform: translateY(-1px); }
+
+  .buser { align-self: flex-end; background: var(--usr); border: 1px solid var(--bdr); border-radius: 14px 14px 2px 14px; padding: 10px 14px; font-size: 14px; line-height: 1.4; max-width: 85%; color: #fff; word-break: break-word; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  .buser img { display: block; max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 8px; border: 1px solid rgba(255,255,255,0.1); }
+  
+  .bbot { align-self: flex-start; width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 8px; animation: slideUp 0.25s ease; }
+  
+  .sec { background: var(--sf); border: 1px solid var(--bdr); border-radius: 8px; padding: 12px 14px; position: relative; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  .sec::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; }
+  .slbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; width: 100%; }
+  .ssub { font-size: 9px; text-transform: none; font-weight: 500; color: var(--txt2); margin-left: auto; letter-spacing: 0; }
+  .stxt { font-size: 13.5px; line-height: 1.5; color: var(--txt); white-space: pre-wrap; }
+  
+  .s1::before { background: var(--c1); } .s1 .slbl { color: var(--c1); }
+  .s2::before { background: var(--c2); } .s2 .slbl { color: var(--c2); }
+  .s3::before { background: var(--c3); } .s3 .slbl { color: var(--c3); }
+  .s4::before { background: var(--c4); } .s4 .slbl { color: var(--c4); }
+  
+  .dose { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25); color: #fcd34d; padding: 1px 4px; border-radius: 4px; font-weight: 600; font-family: monospace; }
+  .proto { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: #60a5fa; padding: 1px 4px; border-radius: 4px; font-weight: 600; }
+  
+  .errbox { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #f87171; padding: 12px; border-radius: 8px; font-size: 13px; }
+  .typing { display: flex; gap: 4px; padding: 4px 0; } .td { width: 6px; height: 6px; background: var(--txt2); border-radius: 50%; animation: bounce 1.4s infinite both; }
+  .td:nth-child(2) { animation-delay: .2s; } .td:nth-child(3) { animation-delay: .4s; }
+
+  .input-container {
+    padding: 12px 16px;
+    background: var(--sf);
+    border-top: 1px solid var(--bdr);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  .bar-tools { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+  .left-tools { display: flex; gap: 8px; } .right-tools { display: flex; gap: 8px; }
+  
+  .input-row { display: flex; gap: 8px; align-items: flex-end; background: var(--inp); border: 1px solid var(--bdr); border-radius: 10px; padding: 6px 10px; transition: border-color 0.15s; }
+  .input-row:focus-within { border-color: var(--bdr2); }
+  
+  .input-row textarea {
+    flex-grow: 1; background: none; border: none; color: #fff; font-size: 14px; line-height: 1.4;
+    resize: none; max-height: 100px; height: 24px; font-family: var(--font-sans); outline: none; padding: 2px 0;
+  }
+  
+  .btn-action { background: none; border: none; color: var(--txt2); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; flex-shrink: 0; }
+  .btn-action:hover { color: #fff; background: var(--sf2); }
+  .btn-send { background: var(--acc); color: #fff; } .btn-send:hover { background: #2563eb; }
+  
+  .mic-btn.listening { background: #ef4444 !important; color: #fff !important; animation: pulse 1.5s infinite; }
+
+  .slide-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    max-width: 440px;
+    height: 100%;
+    background: var(--sf);
+    border-left: 1px solid var(--bdr);
+    box-shadow: -4px 0 24px rgba(0,0,0,0.5);
+    transform: translateX(100%);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 102;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .slide-panel.show { transform: translateX(0); }
+  
+  .panel-header { padding: 14px 16px; border-bottom: 1px solid var(--bdr); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; height: 50px; background: var(--sf); }
+  .panel-header h2 { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: #fff; }
+  
+  .panel-body {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .v-sect-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--acc);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 0 2px 0;
+  }
+
+  .ecg-grid { display: flex; flex-direction: column; gap: 12px; }
+  .ecg-row { display: flex; flex-direction: column; gap: 6px; }
+  .ecg-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--txt2); letter-spacing: 0.5px; }
+  
+  .ecg-opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .ecg-opt { background: var(--inp); border: 1px solid var(--bdr); color: var(--txt); padding: 8px 4px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.1s; user-select: none; }
+  .ecg-opt:hover { border-color: var(--bdr2); background: var(--sf2); }
+  .ecg-opt.active { background: var(--acc); border-color: var(--acc); color: #fff; box-shadow: 0 0 8px rgba(59,130,246,0.4); }
+  
+  .ecg-res-box { background: #0a0f24; border: 1px dashed var(--bdr2); border-radius: 8px; padding: 12px; font-size: 12.5px; line-height: 1.4; white-space: pre-wrap; min-height: 60px; flex-shrink: 0; }
+  
+  .img-preview-box { display: none; position: relative; width: 100%; border-radius: 6px; overflow: hidden; border: 1px solid var(--bdr); margin-top: 4px; flex-shrink: 0; }
+  .img-preview-box img { display: block; width: 100%; max-height: 120px; object-fit: cover; }
+  .btn-del-img { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.7); color: #fff; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+
+  .p-search-row { display: flex; gap: 8px; position: sticky; top: 0; background: var(--sf); padding-bottom: 4px; z-index: 10; flex-shrink: 0; }
+  .p-search-row input { background: var(--inp); border: 1px solid var(--bdr); border-radius: 6px; padding: 8px 12px; color: #fff; font-size: 13px; outline: none; width: 100%; }
+  .p-search-row input:focus { border-color: var(--bdr2); }
+  
+  .p-card { background: var(--sf2); border: 1px solid var(--bdr); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px; transition: border-color 0.15s; flex-shrink: 0; }
+  .p-card:hover { border-color: var(--bdr2); }
+  .p-head { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 4px; }
+  .p-card strong { font-size: 14px; color: #fff; }
+  .p-adm { font-size: 10px; font-weight: 700; background: var(--bdr); color: var(--txt); padding: 1px 5px; border-radius: 4px; text-transform: uppercase; margin-left: auto; }
+  .route-block { font-size: 12.5px; color: var(--txt); padding: 2px 0; }
+  .dilution-block { font-size: 11px; color: var(--txt2); background: rgba(0,0,0,0.2); padding: 6px; border-radius: 4px; border-left: 2px solid var(--bdr2); margin-top: 2px; }
+  
+  .cap-warn { font-size: 9px; background: rgba(239,68,68,0.15); color: #f87171; padding: 1px 4px; border-radius: 4px; font-weight: 700; margin-left: 4px; border: 1px solid rgba(239,68,68,0.25); }
+  .hidden-card { display: none !important; }
+
+  .panel-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 12px; flex-shrink: 0; background: var(--sf); position: sticky; bottom: 0; }
+
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  @keyframes slideUp { from{opacity:0;transform:translateY(8px)} to{opacity:0;transform:translateY(0)} }
+  @keyframes bounce { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
+  @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(239,68,68,0.5)} 70% {box-shadow: 0 0 0 8px rgba(239,68,68,0)} 100% {box-shadow: 0 0 0 0 rgba(239,68,68,0)} }
+  
+  @media(max-width:600px){
+    .slide-panel { max-width: 100%; border-left: none; }
+    .welcome { margin: 15px auto; }
+    .welcome strong { font-size: 18px; }
+    .buser, .bbot { max-width: 95%; }
+    .ecg-opts { grid-template-columns: repeat(2, 1fr); }
+    .panel-body { padding: 12px; gap: 12px; }
+    .input-container { padding: 8px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="logo">🩺</span>
+    <div class="title-box">
+      <h1>Estación Clínica de Guardia</h1>
+      <p>by Fernando · ASISTENTE INTELIGENTE</p>
+    </div>
+  </div>
+  <div class="status-area">
+    <div class="key-settings" id="key-set">
+      <span>Llave Groq activa</span>
+      <button class="btn-change-key" onclick="changeKey()">[Cambiar]</button>
+    </div>
+    <div class="sdot" id="sdot"></div>
+    <button class="btn-top" onclick="clearScreen()">🗑️ Limpiar</button>
+  </div>
+</header>
+
+<div class="banner-key" id="key-banner">
+  <div class="banner-txt">🔑 Requiere API Key de Groq (Gratuita) para el asistente clínico inteligente:</div>
+  <div class="banner-form">
+    <input type="password" id="key-inp" placeholder="gsk_...">
+    <button onclick="saveKey()">Guardar</button>
+  </div>
+</div>
+
+<div class="main-container">
+  <div class="chat-area">
+    <div class="msgs-box" id="msgs">
+      
+      <div class="welcome" id="welcome">
+        <div style="font-size:32px;margin-bottom:10px">🚑</div>
+        <strong>Estación Clínica de Guardia</strong>
+        <em>Desarrollado por Fernando · Entorno Clínico de Soporte</em>
+        <p>Introduce cualquier motivo de consulta, fármaco o situación crítica.</p>
+        <div class="chips">
+          <div class="chip" onclick="chip('Paciente con dolor torácico agudo')">Dolor torácico</div>
+          <div class="chip" onclick="chip('Código Sepsis criterios de actuación')">Código Sepsis</div>
+          <div class="chip" onclick="chip('PCR adulto algoritmo de actuación SVB SVA')">PCR / RCP</div>
+          <div class="chip" onclick="chip('Shock anafiláctico manejo y dosis')">Anafilaxia</div>
+        </div>
+      </div>
+
+    </div>
+    
+    <div class="input-container">
+      <div class="input-row">
+        <textarea id="inp" placeholder="Escribe o usa el dictado de voz..." rows="1"></textarea>
+        <button class="btn-action btn-send" onclick="doSend()">➔</button>
+      </div>
+      <div class="bar-tools">
+        <div class="left-tools">
+          <button class="btn-top" onclick="togglePanel('ecg')">📊 Calculador ECG / Fotos</button>
+          <button class="btn-top" onclick="togglePanel('vade')">👶 Vademécum Pediátrico</button>
+        </div>
+        <div class="right-tools">
+          <button class="btn-action mic-btn" id="mic-btn" onclick="toggleVoice()">🎙️</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-panel" id="ecg-panel">
+    <div class="panel-header">
+      <h2>Módulo Interactivo ECG</h2>
+      <button class="btn-top" onclick="togglePanel('ecg')">Cerrar ✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="ecg-grid">
+        <div class="ecg-row">
+          <div class="ecg-label">Frecuencia Cardíaca</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="fc" data-val="bradi" onclick="setEcg(this)">Bradicardia &lt;60</button>
+            <button class="ecg-opt" data-param="fc" data-val="normo" onclick="setEcg(this)">Normal 60-100</button>
+            <button class="ecg-opt" data-param="fc" data-val="taqui" onclick="setEcg(this)">Taquicardia &gt;100</button>
+          </div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Ritmo (Regularidad)</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="ritmo" data-val="regular" onclick="setEcg(this)">Regular</button>
+            <button class="ecg-opt" data-param="ritmo" data-val="irregular" onclick="setEcg(this)">Irregular</button>
+          </div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Complejo QRS</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="qrs" data-val="estrecho" onclick="setEcg(this)">Estrecho (&lt;0.12s)</button>
+            <button class="ecg-opt" data-param="qrs" data-val="ancho" onclick="setEcg(this)">Ancho (≥0.12s)</button>
+          </div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Onda P</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="ondap" data-val="presente" onclick="setEcg(this)">Presente</button>
+            <button class="ecg-opt" data-param="ondap" data-val="ausente" onclick="setEcg(this)">Ausente / No visible</button>
+          </div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Segmento ST</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="st" data-val="iso" onclick="setEcg(this)">Isoeléctrico</button>
+            <button class="ecg-opt" data-param="st" data-val="elev" onclick="setEcg(this)">🚨 ELEVACIÓN ST</button>
+            <button class="ecg-opt" data-param="st" data-val="desc" onclick="setEcg(this)">Descenso ST</button>
+          </div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Estado del Paciente</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="estado" data-val="estable" onclick="setEcg(this)">Estable</button>
+            <button class="ecg-opt" data-param="estado" data-val="inestable" onclick="setEcg(this)">🚨 INESTABLE</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ecg-label">Analizar por Foto (Cámara / Galería)</div>
+      <div style="background:var(--inp);border:1px solid var(--bdr);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:8px;flex-shrink:0">
+        <input type="file" id="ecg-img-file" accept="image/*" onchange="previewEcgImg(this)" style="font-size:12px;color:var(--txt2)">
+        <div class="img-preview-box" id="img-preview-box">
+          <button class="btn-del-img" onclick="clearAttachedImg()">✕</button>
+          <img id="img-preview" src="" alt="Previsualización">
+        </div>
+      </div>
+
+      <div class="ecg-label">Interpretación del Algoritmo</div>
+      <div class="ecg-res-box" id="ecg-res-box">Selecciona los parámetros del ECG para obtener interpretación...</div>
+      
+      <div class="panel-actions">
+        <button class="btn-top" style="flex-grow:1;background:#1e293b;justify-content:center;padding:12px" onclick="resetEcgPanel()">Reiniciar Panel</button>
+        <button class="btn-top" style="flex-grow:2;background:var(--acc);border-color:var(--acc);justify-content:center;padding:12px" onclick="sendEcgToAi()">Enviar al Asistente IA ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-panel" id="vade-panel">
+    <div class="panel-header">
+      <h2>Vademécum Pediátrico · by Fernando</h2>
+      <button class="btn-top" onclick="togglePanel('vade')">Cerrar ✕</button>
+    </div>
+    <div class="panel-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;flex-shrink:0">
+        <div class="ecg-row">
+          <div class="ecg-label">Peso del Niño (kg)</div>
+          <div class="p-search-row" style="padding:0;"><input type="number" id="p-weight" placeholder="Ej: 14" step="0.5" oninput="calcPed(this.value)"></div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Filtrar Fármaco</div>
+          <div class="p-search-row" style="padding:0;"><input type="text" id="p-search" placeholder="Buscar..." oninput="filterPed(this.value)"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;" id="vade-list">
+        
+        <div class="v-sect-title" id="main-ped-title">⭐ Primera Línea — Urgencias Frecuentes</div>
+
+        <div class="p-card" data-name="adrenalina epinefrina anafilaxia shock rcp paro" data-line="first">
+          <div class="p-head"><strong>Adrenalina / Epinefrina</strong><span class="p-adm">IM / IV / NEB</span></div>
+          <small style="color:var(--txt2)">Paro Cardiorrespiratorio (PCR) · Anafilaxia · Estridor</small>
+          <div class="route-block">■ IM Anafilaxia (<span class="dose">0.01 mg/kg</span>): <span class="calc-val" data-mult="0.01" data-max="0.5" data-unit="mg">—</span> mg · Sin diluir (1mg/ml)</div>
+          <div class="route-block">■ IV/IO RCP (<span class="dose">0.1 ml/kg 1:10k</span>): <span class="calc-val" data-mult="0.1" data-max="10" data-unit="ml">—</span> ml de la dilución</div>
+          <div class="route-block">■ Nebulizada Estridor (<span class="dose">0.5 mg/kg</span>): <span class="calc-val" data-mult="0.5" data-max="5" data-unit="mg">—</span> mg (ó ml) directo</div>
+          <div class="dilution-block">🧪 RCP: 1amp (1mg) + 9cc SF (1:10.000). Anafilaxia: IM profunda en cara anterolateral del muslo.</div>
+        </div>
+
+        <div class="p-card" data-name="amoxicilina clavulanico augmentin antibiotico infeccion" data-line="first">
+          <div class="p-head"><strong>Amoxicilina-Clavulánico (<em>Augmentine®</em>)</strong><span class="p-adm">IV / VO</span></div>
+          <small style="color:var(--txt2)">Antibioterapia empírica de amplio espectro</small>
+          <div class="route-block">■ IV Infusión (<span class="dose">30 mg/kg</span>): <span class="calc-val" data-mult="30" data-max="1200" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Máx 1200 mg. Reconstituir e infundir diluido en 50-100 ml de SF a pasar en 30-40 minutos.</div>
+        </div>
+
+        <div class="p-card" data-name="atropina bradicardia vagal rcp" data-line="first">
+          <div class="p-head"><strong>Atropina</strong><span class="p-adm">IV / IO</span></div>
+          <small style="color:var(--txt2)">Bradicardia sintomática / Secuencia de Intubación Rápica (SIR)</small>
+          <div class="route-block">■ IV/IO (<span class="dose">0.02 mg/kg</span>): <span class="calc-val" data-mult="0.02" data-max="0.5" data-min="0.1" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Mínimo 0.1 mg (evita bradicardia paradójica) y Máximo 0.5 mg por dosis. Bólido rápido.</div>
+        </div>
+
+        <div class="p-card" data-name="dexametasona fortecortin crup laringitis asma" data-line="first">
+          <div class="p-head"><strong>Dexametasona (<em>Fortecortin®</em>)</strong><span class="p-adm">VO / IM / IV</span></div>
+          <small style="color:var(--txt2)">Crup laringitis aguda · Edema de vía aérea</small>
+          <div class="route-block">■ VO/IM/IV (<span class="dose">0.6 mg/kg</span>): <span class="calc-val" data-mult="0.6" data-max="12" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Tope seguro 12 mg. La ampolla IV se puede administrar por vía oral mezclada con un poco de sirope.</div>
+        </div>
+
+        <div class="p-card" data-name="ibuprofeno dalsy fiebre dolor antiinflamatorio junifen" data-line="first">
+          <div class="p-head"><strong>Ibuprofeno (<em>Dalsy® / Junifen®</em>)</strong><span class="p-adm">VO</span></div>
+          <small style="color:var(--txt2)">Fiebre moderada-alta · Dolor osteomuscular o inflamatorio</small>
+          <div class="route-block">■ VO (<span class="dose">10 mg/kg</span>): <span class="calc-val" data-mult="10" data-max="400" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Máx 400 mg/dosis. Fórmula Dalsy 2%: kg / 3 = ml a dar. Uso exclusivo en mayores de 6 meses.</div>
+        </div>
+
+        <div class="p-card" data-name="midazolam dormicum convulsion status sedacion" data-line="first">
+          <div class="p-head"><strong>Midazolam (<em>Dormicum®</em>)</strong><span class="p-adm">IV / IN / BUC</span></div>
+          <small style="color:var(--txt2)">Crisis convulsiva aguda · Sedación precirugía/procedimientos</small>
+          <div class="route-block">■ IV/IO (<span class="dose">0.1 mg/kg</span>): <span class="calc-val" data-mult="0.1" data-max="5" data-unit="mg">—</span> mg</div>
+          <div class="route-block">■ Intranasal/Bucal (<span class="dose">0.2 mg/kg</span>): <span class="calc-val" data-mult="0.2" data-max="10" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Máx IV 5 mg; IN 10 mg. Monitorizar saturación y disponer de material de vía aérea (Riesgo de apnea).</div>
+        </div>
+
+        <div class="p-card" data-name="ondansetron zofran vomitos nauseas gastroenteritis gea" data-line="first">
+          <div class="p-head"><strong>Ondansetrón (<em>Zofran®</em>)</strong><span class="p-adm">VO / IV</span></div>
+          <small style="color:var(--txt2)">Antiemético de elección en Gastroenteritis Aguda (GEA)</small>
+          <div class="route-block">■ VO/IV Lento (<span class="dose">0.15 mg/kg</span>): <span class="calc-val" data-mult="0.15" data-max="8" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Máximo absoluto 8 mg. En VO tolerar 15-20 min antes de reiniciar tolerancia hídrica.</div>
+        </div>
+
+        <div class="p-card" data-name="paracetamol apiretal fiebre dolor perfalgan analgesia" data-line="first">
+          <div class="p-head"><strong>Paracetamol (<em>Apiretal® / Perfalgan®</em>)</strong><span class="p-adm">VO / IV</span></div>
+          <small style="color:var(--txt2)">Fiebre · Dolor leve-moderado de primera línea</small>
+          <div class="route-block">■ VO (<span class="dose">15 mg/kg</span>): <span class="calc-val" data-mult="15" data-max="1000" data-unit="mg">—</span> mg</div>
+          <div class="route-block">■ IV Infusión (<span class="dose">15 mg/kg</span>): <span class="calc-val" data-mult="15" data-max="1000" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Apiretal VO: kg x 0.15 = ml directos. IV pasar listo para usar (10mg/ml) en un periodo de 15 min.</div>
+        </div>
+
+        <div class="p-card" data-name="prednisolona estilsona asma bronquitis corticoide gotas" data-line="first">
+          <div class="p-head"><strong>Prednisolona (<em>Estilsona®</em>)</strong><span class="p-adm">VO</span></div>
+          <small style="color:var(--txt2)">Crisis asmática · Broncoespasmo agudo moderado</small>
+          <div class="route-block">■ VO (<span class="dose">1 mg/kg</span>): <span class="calc-val" data-mult="1" data-max="40" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Estilsona gotas: 1 gota = 1 mg. Muy práctico. Dosis máxima diaria recomendada: 40 mg.</div>
+        </div>
+
+        <div class="p-card" data-name="salbutamol ventolin broncoespasmo asma sibilancias inhalador" data-line="first">
+          <div class="p-head"><strong>Salbutamol (<em>Ventolin®</em>)</strong><span class="p-adm">NEB / INH</span></div>
+          <small style="color:var(--txt2)">Crisis asmática · Bronquitis · Sibilancias</small>
+          <div class="route-block">■ Nebulizado (<span class="dose">0.15 mg/kg</span>): <span class="calc-val" data-mult="0.15" data-max="5" data-min="1.25" data-unit="mg">—</span> mg</div>
+          <div class="route-block">■ Inhalado (MDI): <span class="dose">2-10 pufs</span> con cámara espaciadora según gravedad.</div>
+          <div class="dilution-block">🧪 Nebulizado: Mín 1.25 mg, Máx 5 mg. Enrasar con SF hasta 4 ml totales. Flujo de O2 a 6-8 L/min.</div>
+        </div>
+
+
+        <div class="v-sect-title hidden-card" id="adv-title">📦 Farmacia Completa (Urgencias Especializadas y Críticos)</div>
+
+        <div class="p-card hidden-card" data-name="adenosina tpsv taquicardia supraventricular ritmo" data-line="second">
+          <div class="p-head"><strong>Adenosina</strong><span class="p-adm">IV BOLO</span></div>
+          <small style="color:var(--txt2)">Taquicardia Supraventricular (TPSV)</small>
+          <div class="route-block">■ IV Bolo rápido (<span class="dose">0.1 mg/kg</span>): <span class="calc-val" data-mult="0.1" data-max="6" data-unit="mg">—</span> mg · 1ª Dosis</div>
+          <div class="route-block">■ IV 2ª Dosis (<span class="dose">0.2 mg/kg</span>): <span class="calc-val" data-mult="0.2" data-max="12" data-unit="mg">—</span> mg · Si no revierte</div>
+          <div class="dilution-block">🧪 Técnica de las 2 llaves: pasar bolo ultra-rápido en vena proximal seguido inmediatamente de un push de 10-20 ml de SF. Monitorización ECG continua.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="amiodarona cordarone antiarritmico rcp fv tv" data-line="second">
+          <div class="p-head"><strong>Amiodarona (<em>Cordarone®</em>)</strong><span class="p-adm">IV PERF</span></div>
+          <small style="color:var(--txt2)">Arritmias ventriculares · FV/TV sin pulso refractaria a desfibrilación</small>
+          <div class="route-block">■ IV/IO Bolo RCP (<span class="dose">5 mg/kg</span>): <span class="calc-val" data-mult="5" data-max="300" data-unit="mg">—</span> mg · Tras 3º y 5º choque</div>
+          <div class="route-block">■ IV Infusión (Arritmias): Diluir en Glucosa 5% a pasar en 20-60 min.</div>
+          <div class="dilution-block">🧪 CRÍTICO: Exclusivo diluir en Glucosa al 5% (precipita en SF). Monitorizar TA y ECG por riesgo de hipotensión.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="acido valproico depakine anticonvulsivante crisis epilepsia" data-line="second">
+          <div class="p-head"><strong>Ácido Valproico (<em>Depakine® IV</em>)</strong><span class="p-adm">IV</span></div>
+          <small style="color:var(--txt2)">Estatus epiléptico / Segunda línea anticonvulsivante</small>
+          <div class="route-block">■ IV Directo (<span class="dose">25 mg/kg</span>): <span class="calc-val" data-mult="25" data-max="1500" data-unit="mg">—</span> mg · Carga</div>
+          <div class="dilution-block">🧪 Pasar la dosis de carga diluida en 50 ml de SF en un lapso de 5-10 minutos.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="bicarbonato sodico acidosis hiperpotasemia rcp" data-line="second">
+          <div class="p-head"><strong>Bicarbonato Sódico 1 Molar (1 mEq/ml)</strong><span class="p-adm">IV / IO</span></div>
+          <small style="color:var(--txt2)">Acidosis metabólica severa · Hiperpotasemia · RCP prolongada</small>
+          <div class="route-block">■ IV/IO Lento (<span class="dose">1 mEq/kg</span>): <span class="calc-val" data-mult="1" data-max="50" data-unit="mEq">—</span> mEq (ó ml)</div>
+          <div class="dilution-block">🧪 Diluir 1:1 con Agua Destilada o SF en recién nacidos/lactantes para disminuir osmolaridad. Infundir lento.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="bromuro ipratropio atrovent asma broncoespasmo grave" data-line="second">
+          <div class="p-head"><strong>Bromuro de Ipratropio (<em>Atrovent®</em>)</strong><span class="p-adm">NEB</span></div>
+          <small style="color:var(--txt2)">Crisis asmática grave / Broncoespasmo refractario</small>
+          <div class="route-block">■ Nebulizado: <span id="p-ipra-val" style="color:#34d399;font-weight:700">250</span> mcg (si &lt;20kg) o 500 mcg (si &gt;20kg)</div>
+          <div class="dilution-block">🧪 Administrar conjuntamente en la misma cazoleta con el Salbutamol cada 20 min en la primera hora de crisis grave.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="ceftriaxona rocephin antibiotico sepsis meningitis" data-line="second">
+          <div class="p-head"><strong>Ceftriaxona (<em>Rocephin®</em>)</strong><span class="p-adm">IV / IM</span></div>
+          <small style="color:var(--txt2)">Infección bacteriana grave · Sepsis · Meningitis</small>
+          <div class="route-block">■ IV/IM (<span class="dose">100 mg/kg</span>): <span class="calc-val" data-mult="100" data-max="2000" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Máx 2g. Carga en sepsis. Diluir en 50-100 ml de SF y pasar en 30 minutos. NO coadministrar con Calcio (precipitación).</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="diazepam stesolid valium convulsion crisis" data-line="second">
+          <div class="p-head"><strong>Diazepam (<em>Stesolid® / Valium®</em>)</strong><span class="p-adm">RECT / IV</span></div>
+          <small style="color:var(--txt2)">Crisis convulsiva febril o epiléptica</small>
+          <div class="route-block">■ Rectal (<span class="dose">0.5 mg/kg</span>): <span class="calc-val" data-mult="0.5" data-max="10" data-unit="mg">—</span> mg · (Stesolid microenemas)</div>
+          <div class="route-block">■ IV Lento (<span class="dose">0.3 mg/kg</span>): <span class="calc-val" data-mult="0.3" data-max="10" data-unit="mg">—</span> mg · Dilución directa</div>
+          <div class="dilution-block">🧪 Máximo 10 mg por dosis. En IV, inyectar muy lento (máx 2 mg/min) en vena grande para reducir riesgo de flebitis y depresión respiratoria.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="fentanilo analgesia opioide dolor sedacion" data-line="second">
+          <div class="p-head"><strong>Fentanilo</strong><span class="p-adm">IV / IN</span></div>
+          <small style="color:var(--txt2)">Analgesia mayor · Sedoanalgesia para intubación</small>
+          <div class="route-block">■ IV Lento (<span class="dose">1 mcg/kg</span>): <span class="calc-val" data-mult="1" data-max="100" data-unit="mcg">—</span> mcg</div>
+          <div class="route-block">■ Intranasal (<span class="dose">1.5 mcg/kg</span>): <span class="calc-val" data-mult="1.5" data-max="100" data-unit="mcg">—</span> mcg con atomizador (MAD)</div>
+          <div class="dilution-block">🧪 IV lento en 3-5 min. Riesgo crítico si se administra rápido: Tórax en resina (rigidez de la pared torácica que impide ventilación).</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="fenitoina epilantin anticonvulsivante status crisis" data-line="second">
+          <div class="p-head"><strong>Fenitoína (<em>Epanutin®</em>)</strong><span class="p-adm">IV INMUNE GLUCOSA</span></div>
+          <small style="color:var(--txt2)">Anticonvulsivante mayor · Estatus convulsivo</small>
+          <div class="route-block">■ IV Infusión (<span class="dose">20 mg/kg</span>): <span class="calc-val" data-mult="20" data-max="1000" data-unit="mg">—</span> mg · Carga</div>
+          <div class="dilution-block">🧪 EXCLUSIVO DILUIR EN SF (precipita radicalmente en Glucosa). Ritmo de infusión muy controlado, máximo 1 mg/kg/min (no superar 50 mg/min). Monitorización ECG obligatoria.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="flumazenilo anaxet antidoto benzodiacepinas dormicum anexate" data-line="second">
+          <div class="p-head"><strong>Flumazenilo (<em>Anexate®</em>)</strong><span class="p-adm">IV</span></div>
+          <small style="color:var(--txt2)">Antídoto de intoxicaciones/depresión por benzodiacepinas</small>
+          <div class="route-block">■ IV Lento (<span class="dose">0.01 mg/kg</span>): <span class="calc-val" data-mult="0.01" data-max="0.2" data-unit="mg">—</span> mg · Dosis inicial</div>
+          <div class="dilution-block">🧪 Máximo inicial de 0.2 mg. Se puede repetir cada minuto hasta un máximo acumulado de 1 mg. Evitar si el paciente es epiléptico crónico.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="glucagon hipoglucemia coma diabetes" data-line="second">
+          <div class="p-head"><strong>Glucagón</strong><span class="p-adm">IM / SC</span></div>
+          <small style="color:var(--txt2)">Hipoglucemia grave sin acceso venoso</small>
+          <div class="route-block">■ IM / SC: <span id="p-gluca-val" style="color:#34d399;font-weight:700">0.5</span> mg (si &lt;25kg) o 1.0 mg (si &gt;25kg)</div>
+          <div class="dilution-block">🧪 Actúa liberando reservas hepáticas de glucosa. Al despertar al niño, iniciar tolerancia oral de inmediato. Frecuentes vómitos post-administración.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="glucosa glucosmon hipoglucemia dextrosa suero" data-line="second">
+          <div class="p-head"><strong>Glucosa Corrección (Glucosa 10%)</strong><span class="p-adm">IV LENTO</span></div>
+          <small style="color:var(--txt2)">Hipoglucemia sintomática o confirmada</small>
+          <div class="route-block">■ IV Corrección (<span class="dose">2 ml/kg</span>): <span class="calc-val" data-mult="2" data-max="200" data-unit="ml">—</span> ml de Glucosa al 10%</div>
+          <div class="dilution-block">🧪 Si dispones de Glucosmon 33%: prepara 10 ml de Glucosa 10% uniendo 3 ml de Glucosmon 33% + 7 ml de Agua Destilada o SF. Pasar lento y reevaluar glucemia a los 15 minutos.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="gluconato calcico hipocalcemia hiperpotasemia rcp" data-line="second">
+          <div class="p-head"><strong>Gluconato Cálcico 10%</strong><span class="p-adm">IV MUY LENTO</span></div>
+          <small style="color:var(--txt2)">Hiperpotasemia grave (protector cardíaco) · Hipocalcemia severa</small>
+          <div class="route-block">■ IV Lento (<span class="dose">0.5 ml/kg</span>): <span class="calc-val" data-mult="0.5" data-max="20" data-unit="ml">—</span> ml</div>
+          <div class="dilution-block">🧪 Máx 20 ml por dosis. Infundir muy lento (en 5-10 minutos) con monitorización estricta de FC por riesgo de bradicardia severa si se pasa rápido. Extravasación produce necrosis tisular.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="lorazepam idalprem convulsion crisis ansiedad orfidal" data-line="second">
+          <div class="p-head"><strong>Loracepam (<em>Idalprem® / Orfidal®</em>)</strong><span class="p-adm">IV / IM</span></div>
+          <small style="color:var(--txt2)">Alternativa en crisis convulsivas agudas / Ansiedad severa</small>
+          <div class="route-block">■ IV Lento / IM (<span class="dose">0.05 mg/kg</span>): <span class="calc-val" data-mult="0.05" data-max="4" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Máx 4 mg. En estatus se prefiere Midazolam o Diazepam, pero es una excelente alternativa de acción prolongada.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="metilprednisolona urbason asma corticoide alergia anafilaxia" data-line="second">
+          <div class="p-head"><strong>Metilprednisolona (<em>Urbason®</em>)</strong><span class="p-adm">IV / IM</span></div>
+          <small style="color:var(--txt2)">Crisis asmática moderada-grave · Anafilaxia generalizada</small>
+          <div class="route-block">■ IV / IM (<span class="dose">1.5 mg/kg</span>): <span class="calc-val" data-mult="1.5" data-max="125" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 En asma grave infantil es el corticoide de elección por vía intravenosa. Pasar bolo directo en 3-5 minutos.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="morfina cloruro analgesia dolor intenso trauma" data-line="second">
+          <div class="p-head"><strong>Morfina</strong><span class="p-adm">IV / IM / SC</span></div>
+          <small style="color:var(--txt2)">Dolor severo (traumatismo mayor, quemaduras, postquirúrgico)</small>
+          <div class="route-block">■ IV Lento / IM / SC (<span class="dose">0.1 mg/kg</span>): <span class="calc-val" data-mult="0.1" data-max="10" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Diluir la ampolla en SF para dosificar con precisión. Infundir IV lento en 5 min. Vigilar FR (antídoto: Naloxona).</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="naloxona antidoto opioides morfina fentanilo" data-line="second">
+          <div class="p-head"><strong>Naloxona</strong><span class="p-adm">IV / IO / IM / SC</span></div>
+          <small style="color:var(--txt2)">Antídoto por intoxicación o depresión respiratoria por opioides</small>
+          <div class="route-block">■ IV / IO / IM / SC (<span class="dose">0.01 mg/kg</span>): <span class="calc-val" data-mult="0.01" data-max="0.4" data-unit="mg">—</span> mg · Inicial</div>
+          <div class="dilution-block">🧪 Si no hay respuesta clínica esperada, puede aumentarse la dosis subsiguiente a <span class="dose">0.1 mg/kg</span>. Su vida media es corta; vigilar necesidad de perfusión continua.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="sulfato de magnesio asma grave torsades de pointes" data-line="second">
+          <div class="p-head"><strong>Sulfato de Magnesio 1.5 g (15%)</strong><span class="p-adm">IV PERF LENTA</span></div>
+          <small style="color:var(--txt2)">Crisis asmática severa refractaria · Torsades de Pointes</small>
+          <div class="route-block">■ IV Infusión (<span class="dose">40 mg/kg</span>): <span class="calc-val" data-mult="40" data-max="2000" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Máximo 2 gramos (2000 mg). Diluir obligatoriamente en 50-100 ml de SF o Glucosa 5% y pasar en 20-30 minutos para evitar hipotensión súbita o arritmias.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="vancomicina antibiotico infeccion grave sarm sarm" data-line="second">
+          <div class="p-head"><strong>Vancomicina</strong><span class="p-adm">IV INFUSIÓN MUY LENTA</span></div>
+          <small style="color:var(--txt2)">Infecciones bacterianas graves por Gram positivos (e.j. SAMR)</small>
+          <div class="route-block">■ IV Infusión (<span class="dose">15 mg/kg</span>): <span class="calc-val" data-mult="15" data-max="1000" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 CRÍTICO: Diluir exhaustivamente (máximo 5mg/ml) e infundir de forma muy lenta (mínimo en 60 minutos). Si se pasa rápido produce el "Síndrome del Hombre Rojo" por histamina.</div>
+        </div>
+
+      </div>
+
+      <div class="panel-actions">
+        <button class="btn-top" style="flex-grow:1;background:#1e293b;justify-content:center;padding:12px" onclick="resetPedPanel()">Limpiar Calculadora</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== API KEY ==========
+let apiKey = localStorage.getItem('sescam_groq_key') || '';
+
+function initKey() {
+  const banner = document.getElementById('key-banner');
+  const ks = document.getElementById('key-set');
+  const dot = document.getElementById('sdot');
+  if (apiKey) {
+    banner.classList.add('hidden');
+    ks.classList.add('show');
+    dot.className = 'sdot dok';
+  } else {
+    banner.classList.remove('hidden');
+    ks.classList.remove('show');
+    dot.className = 'sdot dwarn';
+  }
+}
+function saveKey() {
+  const v = document.getElementById('key-inp').value.trim();
+  if (!v) { alert('Pega tu API Key de Groq.'); return; }
+  apiKey = v;
+  localStorage.setItem('sescam_groq_key', apiKey);
+  initKey();
+}
+function changeKey() {
+  apiKey = '';
+  localStorage.removeItem('sescam_groq_key');
+  document.getElementById('key-inp').value = '';
+  initKey();
+}
+
+// ========== SYSTEM PROMPT ==========
+const SYS = `Eres un asistente clínico experto para enfermeros/as de urgencias. Creado por Fernando. Directo, clínico, sin rodeos y sumamente resolutivo.
+
+RESPONDE SIEMPRE con un JSON válido con exactamente estas 4 claves, sin texto fuera del JSON:
+{"concepto":"...","fisiopatologia":"...","enfermeria":"...","alertas":"..."}
+
+ENFERMERÍA: 1.ABCDE+constantes 2.Vía/monitorización/analítica 3.Intervenciones con dosis exactas 4.Registros y cuidados 5.Confort e información.
+ALERTAS: escalada médica inmediata, errores frecuentes, precauciones farmacológicas y criterios de gravedad.
+REGLAS: Habla como un compañero de guardia experimentado, usa siglas aclaradas la primera vez, sin markdown estructurado plano dentro del JSON, basándote en guías de consenso internacionales (ERC 2021, ESC, NICE).`;
+
+// ========== HISTORIAL Y VOZ ==========
+let hist = [];
+let attachedImgBase64 = null;
+let recognition = null, voiceActive = false, voiceTimeout = null;
+const inpField = document.getElementById('inp');
+
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SC = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SC();
+  recognition.lang = 'es-ES'; recognition.continuous = true; recognition.interimResults = true;
+  recognition.onresult = (e) => {
+    clearTimeout(voiceTimeout); let trans = '';
+    for (let i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i].isFinal) trans += e.results[i][0].transcript;
+    }
+    if (trans) inpField.value = trans;
+    voiceTimeout = setTimeout(() => { if (voiceActive && inpField.value.trim()) { stopVoice(); doSend(); } }, 1800);
+  };
+  recognition.onerror = () => stopVoice();
+  recognition.onend = () => { if (voiceActive) stopVoice(); };
+}
+function toggleVoice() { voiceActive ? stopVoice() : startVoice(); }
+function startVoice() {
+  voiceActive = true; inpField.value = '';
+  document.getElementById('mic-btn').classList.add('listening');
+  if (recognition) recognition.start();
+}
+function stopVoice() {
+  voiceActive = false; clearTimeout(voiceTimeout);
+  document.getElementById('mic-btn').classList.remove('listening');
+  if (recognition) recognition.stop();
+}
+
+// ========== IMAGEN ECG ==========
+function previewEcgImg(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const maxW = 900; let w = img.width, h = img.height;
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      attachedImgBase64 = canvas.toDataURL('image/jpeg', 0.65);
+      document.getElementById('img-preview').src = attachedImgBase64;
+      document.getElementById('img-preview-box').style.display = 'block';
+      document.getElementById('ecg-res-box').innerHTML = "<span style='color:#34d399;font-weight:700'>📸 Foto ECG lista. Pulsa «Enviar al Asistente IA».</span>";
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function clearAttachedImg() {
+  attachedImgBase64 = null;
+  document.getElementById('ecg-img-file').value = '';
+  document.getElementById('img-preview-box').style.display = 'none';
+}
+
+// ========== PANELS ==========
+function togglePanel(id) {
+  const panel = document.getElementById(id + '-panel');
+  const isOpen = panel.classList.contains('show');
+  document.querySelectorAll('.slide-panel').forEach(p => p.classList.remove('show'));
+  if (!isOpen) panel.classList.add('show');
+}
+
+// ========== CHAT ==========
+async function sendMsg(txt) {
+  if (!txt.trim() && !attachedImgBase64) return;
+  if (!apiKey) { alert('Configura tu API Key de Groq primero.'); return; }
+  rmWelcome(); addUser(txt, attachedImgBase64);
+  
+  let messagesToSend = [];
+  if (attachedImgBase64) {
+    messagesToSend = [
+      { role: 'system', content: SYS },
+      { role: 'user', content: [
+          { type: 'text', text: txt || 'Analiza esta tira ECG.' },
+          { type: 'image_url', image_url: { url: attachedImgBase64 } }
+        ] 
+      }
+    ];
+    hist = []; 
+  } else {
+    hist.push({ role: 'user', content: txt });
+    messagesToSend = [{ role: 'system', content: SYS }, ...hist];
+  }
+
+  clearAttachedImg();
+  const tid = addTyping(); document.getElementById('sdot').className = 'sdot dwarn';
+  
+  try {
+    const isVision = messagesToSend[messagesToSend.length - 1].content instanceof Array;
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+      body: JSON.stringify({
+        model: isVision ? 'llama-3.2-11b-vision-preview' : 'llama-3.3-70b-versatile',
+        messages: messagesToSend,
+        max_tokens: 1500, temperature: 0.2
+      })
+    });
+    const d = await r.json(); rmEl(tid);
+    if (d.error) throw new Error(d.error.message);
+    let raw = d.choices?.[0]?.message?.content || '';
+    
+    let p; 
+    try { 
+      const jsonMatch = raw.match(/\{[\s\S]*\}/);
+      if (jsonMatch) { p = JSON.parse(jsonMatch[0]); } else { throw new Error("No JSON"); }
+    } catch { 
+      p = { concepto: raw, fisiopatologia: '', enfermeria: '', alertas: '' }; 
+    }
+    
+    addBot(p); 
+    if (!isVision) { hist.push({ role: 'assistant', content: raw }); }
+    document.getElementById('sdot').className = 'sdot dok';
+  } catch (e) {
+    rmEl(tid); addErr('Error: ' + (e.message || 'Error en la petición.'));
+    document.getElementById('sdot').className = 'sdot derr';
+  }
+  scrollB();
+}
+
+function rmWelcome() { const w = document.getElementById('welcome'); if (w) w.remove(); }
+
+function addUser(txt, img) {
+  const el = document.createElement('div'); el.className = 'buser';
+  if (txt) el.textContent = txt;
+  if (img) { const i = document.createElement('img'); i.src = img; el.appendChild(i); }
+  document.getElementById('msgs').appendChild(el); scrollB();
+}
+
+function addBot(d) {
+  const secs = [
+    { k: 'concepto',       lbl: 'Concepto',      sub: 'definición · enfoque básico', cls: 's1' },
+    { k: 'fisiopatologia', lbl: 'Fisiopatología', sub: 'clínica · presentación',         cls: 's2' },
+    { k: 'enfermeria',     lbl: 'Enfermería',     sub: 'intervenciones · monitorización · dosis', cls: 's3' },
+    { k: 'alertas',        lbl: 'Alertas',        sub: 'seguridad · errores · criterios de aviso',  cls: 's4' }
+  ];
+  const wrap = document.createElement('div'); wrap.className = 'bbot';
+  secs.forEach(s => {
+    const v = (d[s.k] || '').trim(); if (!v) return;
+    const sec = document.createElement('div'); sec.className = 'sec ' + s.cls;
+    sec.innerHTML = `<div class="slbl">${s.lbl}<span class="ssub">${s.sub}</span></div><div class="stxt">${fmt(v)}</div>`;
+    wrap.appendChild(sec);
+  });
+  document.getElementById('msgs').appendChild(wrap); scrollB();
+}
+
+function fmt(t) {
+  return esc(t)
+    .replace(/(\d+[,.]?\d*\s*(mg|mcg|ml|UI|mEq|mmHg|lpm|rpm|%|mL\/h|gotas\/min))/gi, '<span class="dose">$1</span>')
+    .replace(/(SVB|SVA|RCP|ABCDE|ERC\s?\d+|Manchester)/gi, '<span class="proto">$1</span>');
+}
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+let tc = 0;
+function addTyping() {
+  const id = 't' + (++tc); const el = document.createElement('div');
+  el.id = id; el.className = 'bbot';
+  el.innerHTML = `<div class="sec s2"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;
+  document.getElementById('msgs').appendChild(el); scrollB(); return id;
+}
+function addErr(msg) {
+  const el = document.createElement('div'); el.className = 'bbot';
+  el.innerHTML = `<div class="errbox">${esc(msg)}</div>`;
+  document.getElementById('msgs').appendChild(el);
+}
+function rmEl(id) { const e = document.getElementById(id); if (e) e.remove(); }
+
+function scrollB() {
+  const m = document.getElementById('msgs');
+  setTimeout(() => { m.scrollTop = m.scrollHeight; }, 50);
+}
+
+function clearScreen() {
+  hist = [];
+  document.getElementById('msgs').innerHTML = `<div class="welcome" id="welcome"><div style="font-size:32px;margin-bottom:10px">🚑</div><strong>Estación Clínica de Guardia</strong><em>Desarrollado por Fernando · Entorno Clínico de Soporte</em><p>Limpio y listo para la guardia.</p><div class="chips"><div class="chip" onclick="chip('Paciente con dolor torácico agudo')">Dolor torácico</div><div class="chip" onclick="chip('Código Sepsis criterios de actuación')">Código Sepsis</div><div class="chip" onclick="chip('PCR adulto algoritmo de actuación SVB SVA')">PCR / RCP</div><div class="chip" onclick="chip('Shock anafiláctico manejo y dosis')">Anafilaxia</div></div></div>`;
+  document.getElementById('sdot').className = 'sdot';
+}
+
+function chip(txt) { document.getElementById('inp').value = txt; doSend(); }
+function doSend() {
+  const txt = inpField.value.trim(); if (!txt && !attachedImgBase64) return;
+  inpField.value = ''; inpField.style.height = 'auto'; sendMsg(txt);
+}
+inpField.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); } });
+inpField.addEventListener('input', function () { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 100) + 'px'; });
+
+// ========== ECG — setEcg ==========
+const ecgState = {};
+
+function setEcg(btn) {
+  const param = btn.dataset.param;
+  const val = btn.dataset.val;
+  document.querySelectorAll(`.ecg-opt[data-param="${param}"]`).forEach(b => b.classList.remove('active'));
+  if (ecgState[param] === val) {
+    delete ecgState[param];
+  } else {
+    ecgState[param] = val;
+    btn.classList.add('active');
+  }
+  updateEcgResult();
+}
+
+function updateEcgResult() {
+  const box = document.getElementById('ecg-res-box');
+  const {fc, ritmo, qrs, ondap, st, estado} = ecgState;
+
+  if (!fc && !ritmo && !qrs && !ondap && !st && !estado) {
+    box.style.color = 'var(--txt2)'; box.style.fontStyle = 'italic';
+    box.textContent = 'Selecciona los parámetros del ECG para obtener interpretación...';
+    return;
+  }
+
+  box.style.color = 'var(--txt)'; box.style.fontStyle = 'normal';
+  let interp = ''; let urgente = false;
+
+  if (fc === 'bradi') interp += '⚡ FC baja (<60lpm) — Valorar atropina si sintomática.\n';
+  if (fc === 'normo') interp += '✓ FC normal (60-100lpm).\n';
+  if (fc === 'taqui') interp += '⚡ FC elevada (>100lpm) — ECG completo, valorar causa.\n';
+  if (ritmo === 'irregular') interp += '⚡ Ritmo irregular — Sospechar FA (Fibrilación Auricular).\n';
+  if (qrs === 'estrecho' && ondap === 'presente' && ritmo === 'regular') interp += '✓ Ritmo sinusal regular.\n';
+  if (qrs === 'estrecho' && ondap === 'ausente' && ritmo === 'irregular') interp += '⚠️ Posible FA: QRS estrecho + ausencia de onda P + ritmo irregular.\n';
+  if (qrs === 'ancho') { interp += '⚠️ QRS ancho — Sospechar bloqueo de rama o TV.\n'; }
+  if (qrs === 'ancho' && fc === 'taqui') { interp += '🚨 TAQUICARDIA DE QRS ANCHO — Posible TV. Si inestable: cardioversión inmediata.\n'; urgente = true; }
+  if (st === 'elev') { interp += '🚨 ELEVACIÓN ST — ACTIVAR CÓDIGO INFARTO INMEDIATAMENTE. Avisar médico YA.\n'; urgente = true; }
+  if (st === 'desc') interp += '⚠️ Descenso ST — Isquemia subendocárdica. Realizar ECG seriados.\n';
+  if (st === 'iso') interp += '✓ Segmento ST isoeléctrico.\n';
+  if (estado === 'inestable') { interp += '🚨 PACIENTE INESTABLE — Monitorización continua, avisar médico URGENTE y preparar carro de paradas.\n'; urgente = true; }
+
+  box.style.borderColor = urgente ? '#ef4444' : 'var(--bdr2)';
+  box.style.background = urgente ? 'rgba(239,68,68,.07)' : '#0a0f24';
+  box.textContent = interp.trim() || 'Continúa seleccionando parámetros...';
+}
+
+function sendEcgToAi() {
+  const {fc, ritmo, qrs, ondap, st, estado} = ecgState;
+  const txt = `Analiza este ECG: FC=${fc||'?'}, Ritmo=${ritmo||'?'}, QRS=${qrs||'?'}, OndaP=${ondap||'?'}, ST=${st||'?'}, EstadoClínico=${estado||'?'}${attachedImgBase64 ? ' + imagen adjunta' : ''}. Dame interpretación clínica completa y actuación enfermera coordinada.`;
+  togglePanel('ecg'); document.getElementById('inp').value = txt; doSend();
+}
+
+function resetEcgPanel() {
+  Object.keys(ecgState).forEach(k => delete ecgState[k]);
+  document.querySelectorAll('.ecg-opt').forEach(b => b.classList.remove('active'));
+  const box = document.getElementById('ecg-res-box');
+  box.textContent = 'Selecciona los parámetros del ECG para obtener interpretación...';
+  box.style.color = 'var(--txt2)'; box.style.fontStyle = 'italic';
+  box.style.borderColor = 'var(--bdr2)'; box.style.background = '#0a0f24';
+  clearAttachedImg();
+}
+
+// ========== VADEMÉCUM — calcPed ==========
+function calcPed(kgStr) {
+  const kg = parseFloat(kgStr); if (isNaN(kg) || kg <= 0) return;
+
+  document.querySelectorAll('.calc-val').forEach(span => {
+    const mult = parseFloat(span.dataset.mult);
+    const max = parseFloat(span.dataset.max);
+    const min = parseFloat(span.dataset.min);
+    if (isNaN(mult)) return;
+
+    let raw = kg * mult; let capped = false;
+    if (!isNaN(max) && raw > max) { raw = max; capped = true; }
+    if (!isNaN(min) && raw < min) { raw = min; }
+
+    const decimals = raw < 1 ? 3 : raw < 10 ? 2 : 1;
+    span.textContent = raw.toFixed(decimals);
+    span.style.color = capped ? '#f87171' : '#34d399';
+
+    let badge = span.nextElementSibling;
+    if (badge && badge.classList.contains('cap-warn')) badge.remove();
+    if (capped) {
+      const b = document.createElement('span');
+      b.className = 'cap-warn'; b.textContent = `TOPE ${max}${span.dataset.unit||'mg'}`;
+      span.insertAdjacentElement('afterend', b);
+    }
+  });
+
+  const ipraEl = document.getElementById('p-ipra-val'); if (ipraEl) ipraEl.textContent = kg < 20 ? '250' : '500';
+  const glucaEl = document.getElementById('p-gluca-val'); if (glucaEl) glucaEl.textContent = kg < 25 ? '0.5' : '1';
+}
+
+// ========== VADEMÉCUM — filterPed CORREGIDO ==========
+function filterPed(query) {
+  const q = query.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const hasQuery = q.length > 0;
+  const mainTitle = document.getElementById('main-ped-title');
+  const advTitle = document.getElementById('adv-title');
+
+  document.querySelectorAll('#vade-list .p-card').forEach(card => {
+    const name = (card.dataset.name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const line = card.dataset.line; const matches = name.includes(q);
+    if (hasQuery) { card.classList.toggle('hidden-card', !matches); } else {
+      if (line === 'second') { card.classList.add('hidden-card'); } else { card.classList.remove('hidden-card'); }
+    }
+  });
+  if (mainTitle) mainTitle.classList.toggle('hidden-card', hasQuery);
+  if (advTitle) advTitle.classList.toggle('hidden-card', !hasQuery);
+}
+
+function resetPedPanel() {
+  document.getElementById('p-weight').value = ''; document.getElementById('p-search').value = '';
+  document.querySelectorAll('.calc-val').forEach(s => { s.textContent = '—'; s.style.color = '#34d399'; });
+  document.querySelectorAll('.cap-warn').forEach(b => b.remove()); filterPed('');
+}
+
+// ========== INIT ==========
+initKey(); filterPed('');
+</script>
+</body>
+</html>
