@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Estación Clínica SESCAM · GUETS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{\n    --bg:#050814;--sf:#0c122c;--sf2:#141d47;--inp:#1b265c;\n    --bdr:#26357a;--bdr2:#3a50b0;--txt:#e2e8f0;--txt2:#94a3b8;--acc:#3b82f6;\n    --usr:#0c1e45;\n    --c1:#ef4444;--b1:rgba(239,68,68,.15);\n    --c2:#10b981;--b2:rgba(16,185,129,.15);\n    --c3:#f59e0b;--b3:rgba(245,158,11,.15);\n    --c4:#f87171;
+    --font-sans: 'Inter', sans-serif;
+    --font-display: 'Syne', sans-serif;
+  }
+  body{background:var(--bg);color:var(--txt);font-family:var(--font-sans);overflow:hidden;display:flex;flex-direction:column;height:100vh;height:-webkit-fill-available}
+  header{background:var(--sf);border-bottom:1px solid var(--bdr);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;z-index:50;flex-shrink:0}
+  .brand{display:flex;align-items:center;gap:10px}.logo{font-size:20px}.title-box h1{font-family:var(--font-display);font-size:15px;font-weight:800;letter-spacing:-0.5px;color:#fff}.title-box p{font-size:10px;color:var(--txt2);font-weight:600;letter-spacing:0.5px}
+  .status-area{display:flex;align-items:center;gap:12px}.sdot{width:10px;height:10px;border-radius:50%;background:#475569;transition:background 0.3s}.dok{background:#10b981;box-shadow:0 0 8px #10b981}.dwarn{background:#f59e0b;box-shadow:0 0 8px #f59e0b}.derr{background:#ef4444;box-shadow:0 0 8px #ef4444}
+  .btn-top{background:var(--sf2);border:1px solid var(--bdr);color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.15s}
+  .btn-top:hover{background:var(--bdr);border-color:var(--bdr2)}
+  
+  .banner-key{background:rgba(245,158,11,0.1);border-bottom:1px solid rgba(245,158,11,0.25);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:40;flex-shrink:0}
+  .banner-key.hidden{display:none}.banner-txt{font-size:12px;color:#fcd34d;display:flex;align-items:center;gap:6px}
+  .banner-form{display:flex;gap:8px;flex-grow:1;max-width:400px}.banner-form input{background:rgba(0,0,0,0.3);border:1px solid rgba(245,158,11,0.4);border-radius:4px;padding:4px 8px;color:#fff;font-size:12px;flex-grow:1;font-family:monospace}
+  .banner-form button{background:#f59e0b;border:none;color:#000;padding:4px 12px;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer}
+  .key-settings{display:none;align-items:center;gap:8px;font-size:11px;color:var(--txt2)}.key-settings.show{display:flex}
+  .btn-change-key{background:none;border:none;color:#f87171;text-decoration:underline;cursor:pointer;font-size:11px;padding:0 2px}
+
+  .main-container{flex-grow:1;position:relative;overflow:hidden;display:flex;width:100%}
+  .chat-area{flex-grow:1;display:flex;flex-direction:column;height:100%;position:relative;background:radial-gradient(circle at top right, rgba(12,18,44,0.5), transparent)}
+  .msgs-box{flex-grow:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
+  
+  .welcome{max-width:500px;margin:40px auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;animation:fadeIn 0.4s ease}
+  .welcome strong{font-family:var(--font-display);font-size:20px;color:#fff;letter-spacing:-0.5px}
+  .welcome em{font-style:normal;font-size:11px;color:var(--acc);font-weight:700;letter-spacing:1px}
+  .welcome p{font-size:13px;color:var(--txt2);margin-top:4px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px;max-width:400px}
+  .chip{background:var(--sf);border:1px solid var(--bdr);padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;transition:all 0.15s;color:var(--txt)}
+  .chip:hover{border-color:var(--bdr2);background:var(--sf2);transform:translateY(-1px)}
+
+  .buser{align-self:flex-end;background:var(--usr);border:1px solid var(--bdr);border-radius:14px 14px 2px 14px;padding:10px 14px;font-size:14px;line-height:1.4;max-width:85%;color:#fff;word-break:break-word;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+  .buser img{display:block;max-width:100%;max-height:200px;border-radius:8px;margin-top:8px;border:1px solid rgba(255,255,255,0.1)}
+  .bbot{align-self:flex-start;width:100%;max-width:800px;display:flex;flex-direction:column;gap:8px;animation:slideUp 0.25s ease}
+  
+  .sec{background:var(--sf);border:1px solid var(--bdr);border-radius:8px;padding:12px 14px;position:relative;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+  .sec::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%}
+  .slbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:flex;align-items:center;justify-content:between;width:100%}
+  .ssub{font-size:9px;text-transform:none;font-weight:500;color:var(--txt2);margin-left:auto;letter-spacing:0}
+  .stxt{font-size:13.5px;line-height:1.5;color:var(--txt);white-space:pre-wrap}
+  
+  .s1::before{background:var(--c1)}.s1 .slbl{color:var(--c1)}
+  .s2::before{background:var(--c2)}.s2 .slbl{color:var(--c2)}
+  .s3::before{background:var(--c3)}.s3 .slbl{color:var(--c3)}
+  .s4::before{background:var(--c4)}.s4 .slbl{color:var(--c4)}
+  
+  .dose{background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);color:#fcd34d;padding:1px 4px;border-radius:4px;font-weight:600;font-family:monospace}
+  .proto{background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#60a5fa;padding:1px 4px;border-radius:4px;font-weight:600}
+  
+  .errbox{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#f87171;padding:12px;border-radius:8px;font-size:13px}
+  .typing{display:flex;gap:4px;padding:4px 0}.td{width:6px;height:6px;background:var(--txt2);border-radius:50%;animation:bounce 1.4s infinite both}
+  .td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+
+  .input-container{padding:12px 16px;background:var(--sf);border-top:1px solid var(--bdr);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+  .bar-tools{display:flex;align-items:center;justify-content:space-between;width:100%}
+  .left-tools{display:flex;gap:8px}.right-tools{display:flex;gap:8px}
+  .input-row{display:flex;gap:8px;align-items:flex-end;background:var(--inp);border:1px solid var(--bdr);border-radius:10px;padding:6px 10px;transition:border-color 0.15s}
+  .input-row:focus-within{border-color:var(--bdr2)}
+  .input-row textarea{flex-grow:1;background:none;border:none;color:#fff;font-size:14px;line-height:1.4;resize:none;max-height:120px;height:24px;font-family:var(--font-sans);outline:none;padding:2px 0}
+  
+  .btn-action{background:none;border:none;color:var(--txt2);width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;flex-shrink:0}
+  .btn-action:hover{color:#fff;background:var(--sf2)}
+  .btn-send{background:var(--acc);color:#fff}.btn-send:hover{background:#2563eb}
+  
+  .mic-btn.listening{background:#ef4444 !important;color:#fff !important;animation:pulse 1.5s infinite}
+
+  .slide-panel{position:absolute;top:0;right:0;width:100%;max-width:440px;height:100%;background:var(--sf);border-left:1px solid var(--bdr);box-shadow:-4px 0 24px rgba(0,0,0,0.4);transform:translateX(100%);transition:transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);z-index:100;display:flex;flex-direction:column}
+  .slide-panel.show{transform:translateX(0)}
+  .panel-header{padding:14px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:between}
+  .panel-header h2{font-family:var(--font-display);font-size:16px;font-weight:700;color:#fff}
+  .panel-body{flex-grow:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+
+  .ecg-grid{display:flex;flex-direction:column;gap:12px}
+  .ecg-row{display:flex;flex-direction:column;gap:6px}
+  .ecg-label{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--txt2);letter-spacing:0.5px}
+  .ecg-opts{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .ecg-opt{background:var(--inp);border:1px solid var(--bdr);color:var(--txt);padding:8px 4px;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;text-align:center;transition:all 0.1s}
+  .ecg-opt:hover{border-color:var(--bdr2);background:var(--sf2)}
+  .ecg-opt.active{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:0 0 8px rgba(59,130,246,0.4)}
+  .ecg-res-box{background:#0a0f24;border:1px dashed var(--bdr2);border-radius:8px;padding:12px;font-size:12.5px;line-height:1.4;white-space:pre-wrap;min-height:60px}
+  
+  .img-preview-box{display:none;position:relative;width:100%;border-radius:6px;overflow:hidden;border:1px solid var(--bdr);margin-top:6px}
+  .img-preview-box img{display:block;width:100%;max-height:150px;object-fit:cover}
+  .btn-del-img{position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.7);color:#fff;border:none;width:24px;height:24px;border-radius:50%;cursor:pointer;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center}
+
+  .p-search-row{display:flex;gap:8px;position:sticky;top:0;background:var(--sf);padding-bottom:10px;z-index:10}
+  .p-search-row input{background:var(--inp);border:1px solid var(--bdr);border-radius:6px;padding:8px 12px;color:#fff;font-size:13px;outline:none;width:100%}
+  .p-search-row input:focus{border-color:var(--bdr2)}
+  .p-card{background:var(--sf2);border:1px solid var(--bdr);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px;transition:border-color 0.15s}
+  .p-card:hover{border-color:var(--bdr2)}
+  .p-head{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:4px}
+  .p-name{font-weight:700;font-size:14px;color:#fff}
+  .p-adm{font-size:10px;font-weight:700;background:var(--bdr);color:var(--txt);padding:1px 5px;border-radius:4px;text-transform:uppercase}
+  .p-dose-line{font-size:12.5px;color:var(--txt);display:flex;align-items:center;justify-content:space-between}
+  .p-label{color:var(--txt2);font-size:12px}
+  .p-val-box{font-weight:700;color:var(--c2);font-family:monospace}
+  .cap-warn{font-size:9px;background:rgba(239,68,68,0.15);color:#f87171;padding:1px 4px;border-radius:4px;font-weight:700;margin-left:4px;border:1px solid rgba(239,68,68,0.25)}
+  .hidden-card{display:none !important}
+  .adv-title{font-size:11px;font-weight:700;color:var(--c3);text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 2px 0}
+
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  @keyframes slideUp { from{opacity:0;transform:translateY(8px)} to{opacity:0;transform:translateY(0)} }
+  @keyframes bounce { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
+  @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(239,68,68,0.5)} 70% {box-shadow: 0 0 0 8px rgba(239,68,68,0)} 100% {box-shadow: 0 0 0 0 rgba(239,68,68,0)} }
+  
+  @media(max-width:600px){
+    .slide-panel{max-width:100%}
+    .welcome strong{font-size:18px}
+    .buser,.bbot{max-width:92%}
+    .ecg-opts{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="logo">🩺</span>
+    <div class="title-box">
+      <h1>Estación Clínica de Guardia</h1>
+      <p>SESCAM · GUETS · ASISTENTE IA</p>
+    </div>
+  </div>
+  <div class="status-area">
+    <div class="key-settings" id="key-set">
+      <span>Llave Groq activa</span>
+      <button class="btn-change-key" onclick="changeKey()">[Cambiar]</button>
+    </div>
+    <div class="sdot" id="sdot"></div>
+    <button class="btn-top" onclick="clearScreen()">🗑️ Limpiar</button>
+  </div>
+</header>
+
+<div class="banner-key" id="key-banner">
+  <div class="banner-txt">🔑 Requiere API Key de Groq (Gratuita) para el asistente clínico inteligente:</div>
+  <div class="banner-form">
+    <input type="password" id="key-inp" placeholder="gsk_...">
+    <button onclick="saveKey()">Guardar</button>
+  </div>
+</div>
+
+<div class="main-container">
+  <div class="chat-area">
+    <div class="msgs-box" id="msgs">
+      
+      <div class="welcome" id="welcome">
+        <div style="font-size:32px;margin-bottom:10px">🚑</div>
+        <strong>Estación Clínica de Guardia</strong>
+        <em>ESQUEMAS GUETS · BASE TEMBLEQUE · SESCAM</em>
+        <p>Introduce cualquier motivo de consulta, fármaco o situación crítica.</p>
+        <div class="chips">
+          <div class="chip" onclick="chip('Paciente con dolor torácico agudo')">Dolor torácico</div>
+          <div class="chip" onclick="chip('Código Sepsis SESCAM')">Código Sepsis</div>
+          <div class="chip" onclick="chip('PCR adulto SVB SVA ERC 2021')">PCR / RCP</div>
+          <div class="chip" onclick="chip('Shock anafiláctico con dosis')">Anafilaxia</div>
+        </div>
+      </div>
+
+    </div>
+    
+    <div class="input-container">
+      <div class="input-row">
+        <textarea id="inp" placeholder="Escribe o usa el dictado de voz..." rows="1"></textarea>
+        <button class="btn-action btn-send" onclick="doSend()">➔</button>
+      </div>
+      <div class="bar-tools">
+        <div class="left-tools">
+          <button class="btn-top" onclick="togglePanel('ecg')">📊 Calculador ECG / Fotos</button>
+          <button class="btn-top" onclick="togglePanel('vade')">👶 Vademécum Pediátrico</button>
+        </div>
+        <div class="right-tools">
+          <button class="btn-action mic-btn" id="mic-btn" onclick="toggleVoice()">🎙️</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-panel" id="ecg-panel">
+    <div class="panel-header">
+      <h2>Módulo Interactivo ECG</h2>
+      <button class="btn-top" onclick="togglePanel('ecg')">Cerrar ✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="ecg-grid">
+        <div class="ecg-row">
+          <div class="ecg-label">Frecuencia Cardíaca</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="fc" data-val="bradi" onclick="setEcg(this)">Bradicardia &lt;60</button>
+            <button class="ecg-opt" data-param="fc" data-val="normo" onclick="setEcg(this)">Normal 60-100</button>
+            <button class="ecg-opt" data-param="fc" data-val="taqui" onclick="setEcg(this)">Taquicardia &gt;100</button>
+          </div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Ritmo (Regularidad)</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="ritmo" data-val="regular" onclick="setEcg(this)">Regular</button>
+            <button class="ecg-opt" data-param="ritmo" data-val="irregular" onclick="setEcg(this)">Irregular (FA?)</button>
+          </div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Complejo QRS</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="qrs" data-val="estrecho" onclick="setEcg(this)">Estrecho (&lt;0.12s)</button>
+            <button class="ecg-opt" data-param="qrs" data-val="ancho" onclick="setEcg(this)">Ancho (≥0.12s)</button>
+          </div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Onda P</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="ondap" data-val="presente" onclick="setEcg(this)">Presente</button>
+            <button class="ecg-opt" data-param="ondap" data-val="ausente" onclick="setEcg(this)">Ausente / No visible</button>
+          </div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Segmento ST</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="st" data-val="iso" onclick="setEcg(this)">Isoeléctrico</button>
+            <button class="ecg-opt" data-param="st" data-val="elev" onclick="setEcg(this)">🚨 ELEVACIÓN ST</button>
+            <button class="ecg-opt" data-param="st" data-val="desc" onclick="setEcg(this)">Descenso ST</button>
+          </div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Estado del Paciente</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="estado" data-val="estable" onclick="setEcg(this)">Estable</button>
+            <button class="ecg-opt" data-param="estado" data-val="inestable" onclick="setEcg(this)">🚨 INESTABLE</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ecg-label" style="margin-top:10px">Analizar por Foto (Cámara / Galería)</div>
+      <div style="background:var(--inp);border:1px solid var(--bdr);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:8px">
+        <input type="file" id="ecg-img-file" accept="image/*" onchange="previewEcgImg(this)" style="font-size:12px;color:var(--txt2)">
+        <div class="img-preview-box" id="img-preview-box">
+          <button class="btn-del-img" onclick="clearAttachedImg()">✕</button>
+          <img id="img-preview" src="" alt="Previsualización">
+        </div>
+      </div>
+
+      <div class="ecg-label" style="margin-top:10px">Interpretación del Algoritmo</div>
+      <div class="ecg-res-box" id="ecg-res-box">Selecciona los parámetros del ECG para obtener interpretación...</div>
+      
+      <div style="display:flex;gap:8px;margin-top:auto">
+        <button class="btn-top" style="flex-grow:1;background:#1e293b;justify-content:center;padding:10px" onclick="resetEcgPanel()">Reiniciar Panel</button>
+        <button class="btn-top" style="flex-grow:2;background:var(--acc);border-color:var(--acc);justify-content:center;padding:10px" onclick="sendEcgToAi()">Enviar al Asistente IA ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-panel" id="vade-panel">
+    <div class="panel-header">
+      <h2>Vademécum Pediátrico Rápido</h2>
+      <button class="btn-top" onclick="togglePanel('vade')">Cerrar ✕</button>
+    </div>
+    <div class="panel-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="ecg-row">
+          <div class="ecg-label">Peso del Niño (kg)</div>
+          <div class="p-search-row" style="padding:0;position:static"><input type="number" id="p-weight" placeholder="Ej: 14" step="0.5" oninput="calcPed(this.value)"></div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Filtrar Fármaco</div>
+          <div class="p-search-row" style="padding:0;position:static"><input type="text" id="p-search" placeholder="Buscar..." oninput="filterPed(this.value)"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px" id="vade-list">
+        
+        <div class="p-card" data-name="Adrenalina Parada RCP Anafilaxia" data-line="first">
+          <div class="p-head"><span class="p-name">Adrenalina 1mg/ml (1:1000)</span><span class="p-adm">IM / IV</span></div>
+          <div class="p-dose-line"><span class="p-label">Parada RCP (IV / IO): 0.01 mg/kg</span><span class="p-val-box"><span class="calc-val" data-mult="0.01" data-unit="ml">—</span> ml</span></div>
+          <div class="p-dose-line"><span class="p-label">Anafilaxia (IM profunda): 0.01 mg/kg</span><span class="p-val-box"><span class="calc-val" data-mult="0.01" data-max="0.5" data-unit="ml">—</span> ml</span></div>
+        </div>
+
+        <div class="p-card" data-name="Atropina Bradicardia RCP" data-line="first">
+          <div class="p-head"><span class="p-name">Atropina 1mg/ml</span><span class="p-adm">IV / IO</span></div>
+          <div class="p-dose-line"><span class="p-label">Bradicardia/RCP (0.02 mg/kg)</span><span class="p-val-box"><span class="calc-val" data-mult="0.02" data-min="0.1" data-max="0.5" data-unit="mg">—</span> ml</span></div>
+        </div>
+
+        <div class="p-card" data-name="Dexametasona Laringitis Crup" data-line="first">
+          <div class="p-head"><span class="p-name">Dexametasona 4mg/ml</span><span class="p-adm">Oral / IM / IV</span></div>
+          <div class="p-dose-line"><span class="p-label">Laringitis aguda (0.15 a 0.6 mg/kg)</span><span class="p-val-box"><span class="calc-val" data-mult="0.15" data-max="12" data-unit="mg">—</span> a <span class="calc-val" data-mult="0.6" data-max="12" data-unit="mg">—</span> mg</span></div>
+        </div>
+
+        <div class="p-card" data-name="Diazepam Convulsión Rectal" data-line="first">
+          <div class="p-head"><span class="p-name">Diazepam Rectal (Stesolid)</span><span class="p-adm">Rectal</span></div>
+          <div class="p-dose-line"><span class="p-label">Crisis convulsiva (0.5 mg/kg)</span><span class="p-val-box"><span class="calc-val" data-mult="0.5" data-max="10" data-unit="mg">—</span> mg</span></div>
+        </div>
+
+        <div class="p-card" data-name="Metilprednisolona Solu-Moderin Asma Anafilaxia" data-line="first">
+          <div class="p-head"><span class="p-name">Metilprednisolona (Urgent)</span><span class="p-adm">IV / IM</span></div>
+          <div class="p-dose-line"><span class="p-label">Crisis asmática / Alergia (1 a 2 mg/kg)</span><span class="p-val-box"><span class="calc-val" data-mult="1" data-max="60" data-unit="mg">—</span> a <span class="calc-val" data-mult="2" data-max="125" data-unit="mg">—</span> mg</span></div>
+        </div>
+
+        <div class="adv-title hidden-card" id="adv-title">Medicamentos de Segunda Línea / Avanzados</div>
+
+        <div class="p-card" data-name="Amiodarona Antiarrítmico" data-line="second">
+          <div class="p-head"><span class="p-name">Amiodarona 50mg/ml</span><span class="p-adm">IV perf</span></div>
+          <div class="p-dose-line"><span class="p-label">Dosis RCP (5 mg/kg tras 3ª y 5ª desf.)</span><span class="p-val-box"><span class="calc-val" data-mult="5" data-max="300" data-unit="mg">—</span> mg</span></div>
+        </div>
+
+        <div class="p-card" data-name="Fentanilo Analgesia Opioide" data-line="second">
+          <div class="p-head"><span class="p-name">Fentanilo 0.05mg/ml (50mcg/ml)</span><span class="p-adm">IV / IN</span></div>
+          <div class="p-dose-line"><span class="p-label">Analgesia/Sedación (1 mcg/kg = 0.02ml/kg)</span><span class="p-val-box"><span class="calc-val" data-mult="0.02" data-unit="ml">—</span> ml</span></div>
+        </div>
+
+        <div class="p-card" data-name="Midazolam Sedación Convulsión" data-line="second">
+          <div class="p-head"><span class="p-name">Midazolam 1mg/ml o 5mg/ml</span><span class="p-adm">IV / Rectal / Bucal</span></div>
+          <div class="p-dose-line"><span class="p-label">Estatus convulsivo IV (0.1 mg/kg)</span><span class="p-val-box"><span class="calc-val" data-mult="0.1" data-max="5" data-unit="mg">—</span> mg</span></div>
+        </div>
+
+        <div class="p-card" data-name="Broma de Ipratropio Atrovent" data-line="second">
+          <div class="p-head"><span class="p-name">Bromuro de Ipratropio (Atrovent)</span><span class="p-adm">Nebulizado</span></div>
+          <div class="p-dose-line"><span class="p-label">Crisis Asma Grave (&lt;20kg:250mcg, ≥20kg:500mcg)</span><span class="p-val-box"><span id="p-ipra-val">—</span> mcg</span></div>
+        </div>
+
+        <div class="p-card" data-name="Glucagón Hipoglucemia" data-line="second">
+          <div class="p-head"><span class="p-name">Glucagón 1mg (Kit)</span><span class="p-adm">IM / SC</span></div>
+          <div class="p-dose-line"><span class="p-label">Hipoglucemia (&lt;25kg:0.5mg, ≥25kg:1mg)</span><span class="p-val-box"><span id="p-gluca-val">—</span> mg</span></div>
+        </div>
+
+      </div>
+
+      <button class="btn-top" style="margin-top:auto;background:#1e293b;justify-content:center;padding:10px" onclick="resetPedPanel()">Limpiar Calculadora</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== API KEY ==========
+let apiKey = localStorage.getItem('sescam_groq_key') || '';
+
+function initKey() {
+  const banner = document.getElementById('key-banner');
+  const ks = document.getElementById('key-set');
+  const dot = document.getElementById('sdot');
+  if (apiKey) {
+    banner.classList.add('hidden');
+    ks.classList.add('show');
+    dot.className = 'sdot dok';
+  } else {
+    banner.classList.remove('hidden');
+    ks.classList.remove('show');
+    dot.className = 'sdot dwarn';
+  }
+}
+function saveKey() {
+  const v = document.getElementById('key-inp').value.trim();
+  if (!v) { alert('Pega tu API Key de Groq (console.groq.com/keys).'); return; }
+  apiKey = v;
+  localStorage.setItem('sescam_groq_key', apiKey);
+  initKey();
+}
+function changeKey() {
+  apiKey = '';
+  localStorage.removeItem('sescam_groq_key');
+  document.getElementById('key-inp').value = '';
+  initKey();
+}
+
+// ========== SYSTEM PROMPT ==========
+const SYS = `Eres un asistente clínico experto para enfermeros/as de urgencias del SESCAM (Servicio de Salud de Castilla-La Mancha). Estilo basado en los "Esquemas Prácticos en Medicina de Urgencias y Emergencias" de la Base Tembleque (GUETS). Colega enfermero de guardia: directo, cercano y resolutivo.
+
+RESPONDE SIEMPRE con un JSON válido con exactamente estas 4 claves, sin texto fuera del JSON:
+{"concepto":"...","fisiopatologia":"...","enfermeria":"...","alertas":"..."}
+
+ENFERMERÍA (esquema GUETS): 1.ABCDE+constantes 2.Vía/monitorización/analítica 3.Intervenciones con dosis exactas 4.Registros Mambrino/DIRAYA 5.Confort e información.
+ALERTAS: avisar médico YA, códigos SESCAM/CLM, errores frecuentes, precauciones farmacológicas, criterios UCI.
+REGLAS: informal de guardia, siglas explicadas la primera vez entre paréntesis, sin markdown, basado en ERC 2021, ESC 2023, SEMICYUC, NICE.`;
+
+// ========== HISTORIAL Y VOZ ==========
+let hist = [];
+let attachedImgBase64 = null;
+let recognition = null, voiceActive = false, voiceTimeout = null;
+const inpField = document.getElementById('inp');
+
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SC = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SC();
+  recognition.lang = 'es-ES'; recognition.continuous = true; recognition.interimResults = true;
+  recognition.onresult = (e) => {
+    clearTimeout(voiceTimeout); let trans = '';
+    for (let i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i].isFinal) trans += e.results[i][0].transcript;
+    }
+    if (trans) inpField.value = trans;
+    voiceTimeout = setTimeout(() => { if (voiceActive && inpField.value.trim()) { stopVoice(); doSend(); } }, 1800);
+  };
+  recognition.onerror = () => stopVoice();
+  recognition.onend = () => { if (voiceActive) stopVoice(); };
+}
+function toggleVoice() { voiceActive ? stopVoice() : startVoice(); }
+function startVoice() {
+  voiceActive = true; inpField.value = '';
+  document.getElementById('mic-btn').classList.add('listening');
+  if (recognition) recognition.start();
+}
+function stopVoice() {
+  voiceActive = false; clearTimeout(voiceTimeout);
+  document.getElementById('mic-btn').classList.remove('listening');
+  if (recognition) recognition.stop();
+}
+
+// ========== IMAGEN ECG ==========
+function previewEcgImg(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const maxW = 900; let w = img.width, h = img.height;
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      attachedImgBase64 = canvas.toDataURL('image/jpeg', 0.65);
+      document.getElementById('img-preview').src = attachedImgBase64;
+      document.getElementById('img-preview-box').style.display = 'block';
+      document.getElementById('ecg-res-box').innerHTML = "<span style='color:#34d399;font-weight:700'>📸 Foto ECG lista. Pulsa «Enviar al Asistente IA».</span>";
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function clearAttachedImg() {
+  attachedImgBase64 = null;
+  document.getElementById('ecg-img-file').value = '';
+  document.getElementById('img-preview-box').style.display = 'none';
+}
+
+// ========== PANELS ==========
+function togglePanel(id) {
+  const panel = document.getElementById(id + '-panel');
+  const isOpen = panel.classList.contains('show');
+  document.querySelectorAll('.slide-panel').forEach(p => p.classList.remove('show'));
+  if (!isOpen) panel.classList.add('show');
+}
+
+// ========== CHAT ==========
+async function sendMsg(txt) {
+  if (!txt.trim() && !attachedImgBase64) return;
+  if (!apiKey) { alert('Configura tu API Key de Groq primero (gratis en console.groq.com/keys).'); return; }
+  rmWelcome(); addUser(txt, attachedImgBase64);
+  
+  let messagesToSend = [];
+  if (attachedImgBase64) {
+    messagesToSend = [
+      { role: 'system', content: SYS },
+      { role: 'user', content: [
+          { type: 'text', text: txt || 'Analiza esta tira ECG.' },
+          { type: 'image_url', image_url: { url: attachedImgBase64 } }
+        ] 
+      }
+    ];
+    hist = []; 
+  } else {
+    hist.push({ role: 'user', content: txt });
+    messagesToSend = [{ role: 'system', content: SYS }, ...hist];
+  }
+
+  clearAttachedImg();
+  const tid = addTyping(); document.getElementById('sdot').className = 'sdot dwarn';
+  
+  try {
+    const isVision = messagesToSend[messagesToSend.length - 1].content instanceof Array;
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+      body: JSON.stringify({
+        model: isVision ? 'llama-3.2-11b-vision-preview' : 'llama-3.3-70b-versatile',
+        messages: messagesToSend,
+        max_tokens: 1500, temperature: 0.2
+      })
+    });
+    const d = await r.json(); rmEl(tid);
+    if (d.error) throw new Error(d.error.message);
+    let raw = d.choices?.[0]?.message?.content || '';
+    
+    let p; 
+    try { 
+      const jsonMatch = raw.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        p = JSON.parse(jsonMatch[0]); 
+      } else {
+        throw new Error("No JSON found");
+      }
+    } catch { 
+      p = { concepto: raw, fisiopatologia: '', enfermeria: '', alertas: '' }; 
+    }
+    
+    addBot(p); 
+    if (!isVision) {
+      hist.push({ role: 'assistant', content: raw });
+    }
+    document.getElementById('sdot').className = 'sdot dok';
+  } catch (e) {
+    rmEl(tid); addErr('Error: ' + (e.message || 'Revisa tu API Key de Groq.'));
+    document.getElementById('sdot').className = 'sdot derr';
+  }
+  scrollB();
+}
+
+function rmWelcome() { const w = document.getElementById('welcome'); if (w) w.remove(); }
+
+function addUser(txt, img) {
+  const el = document.createElement('div'); el.className = 'buser';
+  if (txt) el.textContent = txt;
+  if (img) { const i = document.createElement('img'); i.src = img; el.appendChild(i); }
+  document.getElementById('msgs').appendChild(el); scrollB();
+}
+
+function addBot(d) {
+  const secs = [
+    { k: 'concepto',       lbl: 'Concepto',      sub: 'definición · clasificación · códigos CLM', cls: 's1' },
+    { k: 'fisiopatologia', lbl: 'Fisiopatología', sub: 'mecanismo · presentación clínica',         cls: 's2' },
+    { k: 'enfermeria',     lbl: 'Enfermería',     sub: 'ABCDE · intervenciones · dosis · registros', cls: 's3' },
+    { k: 'alertas',        lbl: 'Alertas',        sub: 'escalada · errores frecuentes · códigos',  cls: 's4' }
+  ];
+  const wrap = document.createElement('div'); wrap.className = 'bbot';
+  secs.forEach(s => {
+    const v = (d[s.k] || '').trim(); if (!v) return;
+    const sec = document.createElement('div'); sec.className = 'sec ' + s.cls;
+    sec.innerHTML = `<div class="slbl">${s.lbl}<span class="ssub">${s.sub}</span></div><div class="stxt">${fmt(v)}</div>`;
+    wrap.appendChild(sec);
+  });
+  document.getElementById('msgs').appendChild(wrap); scrollB();
+}
+
+function fmt(t) {
+  return esc(t)
+    .replace(/(\d+[,.]?\d*\s*(mg|mcg|ml|UI|mEq|mmHg|lpm|rpm|%|mL\/h|gotas\/min))/gi, '<span class="dose">$1</span>')
+    .replace(/(Código\s\w+|SVB|SVA|RCP|ABCDE|ERC\s?\d+|Manchester|SESCAM|GUETS)/gi, '<span class="proto">$1</span>');
+}
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+let tc = 0;
+function addTyping() {
+  const id = 't' + (++tc); const el = document.createElement('div');
+  el.id = id; el.className = 'bbot';
+  el.innerHTML = `<div class="sec s2"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;
+  document.getElementById('msgs').appendChild(el); scrollB(); return id;
+}
+function addErr(msg) {
+  const el = document.createElement('div'); el.className = 'bbot';
+  el.innerHTML = `<div class="errbox">${esc(msg)}</div>`;
+  document.getElementById('msgs').appendChild(el);
+}
+function rmEl(id) { const e = document.getElementById(id); if (e) e.remove(); }
+function scrollB() { const m = document.getElementById('msgs'); setTimeout(() => m.scrollTop = m.scrollHeight, 40); }
+
+function clearScreen() {
+  hist = [];
+  document.getElementById('msgs').innerHTML = `<div class="welcome" id="welcome"><div style="font-size:32px;margin-bottom:10px">🚑</div><strong>Estación Clínica de Guardia</strong><em>ESQUEMAS GUETS · BASE TEMBLEQUE · SESCAM</em><p>Limpio y listo para la guardia.</p><div class="chips"><div class="chip" onclick="chip('Paciente con dolor torácico agudo')">Dolor torácico</div><div class="chip" onclick="chip('Código Sepsis SESCAM')">Código Sepsis</div><div class="chip" onclick="chip('PCR adulto SVB SVA ERC 2021')">PCR / RCP</div><div class="chip" onclick="chip('Shock anafiláctico con dosis')">Anafilaxia</div></div></div>`;
+  document.getElementById('sdot').className = 'sdot';
+}
+
+function chip(txt) { document.getElementById('inp').value = txt; doSend(); }
+function doSend() {
+  const txt = inpField.value.trim(); if (!txt && !attachedImgBase64) return;
+  inpField.value = ''; inpField.style.height = 'auto'; sendMsg(txt);
+}
+inpField.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); } });
+inpField.addEventListener('input', function () { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 120) + 'px'; });
+
+// ========== ECG — setEcg ==========
+const ecgState = {};
+
+function setEcg(btn) {
+  const param = btn.dataset.param;
+  const val = btn.dataset.val;
+  document.querySelectorAll(`.ecg-opt[data-param="${param}"]`).forEach(b => b.classList.remove('active'));
+  if (ecgState[param] === val) {
+    delete ecgState[param];
+  } else {
+    ecgState[param] = val;
+    btn.classList.add('active');
+  }
+  updateEcgResult();
+}
+
+function updateEcgResult() {
+  const box = document.getElementById('ecg-res-box');
+  const {fc, ritmo, qrs, ondap, st, estado} = ecgState;
+
+  if (!fc && !ritmo && !qrs && !ondap && !st && !estado) {
+    box.style.color = 'var(--txt2)'; box.style.fontStyle = 'italic';
+    box.textContent = 'Selecciona los parámetros del ECG para obtener interpretación...';
+    return;
+  }
+
+  box.style.color = 'var(--txt)'; box.style.fontStyle = 'normal';
+  let interp = '';
+  let urgente = false;
+
+  if (fc === 'bradi') interp += '⚡ FC baja (<60lpm) — Valorar atropina si sintomática.\n';
+  if (fc === 'normo') interp += '✓ FC normal (60-100lpm).\n';
+  if (fc === 'taqui') interp += '⚡ FC elevada (>100lpm) — ECG completo, valorar causa.\n';
+  if (ritmo === 'irregular') interp += '⚡ Ritmo irregular — Sospechar FA (Fibrilación Auricular). Valorar anticoagulación.\n';
+  if (qrs === 'estrecho' && ondap === 'presente' && ritmo === 'regular') interp += '✓ Ritmo sinusal (QRS estrecho, onda P presente, rítmico).\n';
+  if (qrs === 'estrecho' && ondap === 'ausente' && ritmo === 'irregular') interp += '⚠️ Posible FA: QRS estrecho + ausencia de onda P + ritmo irregular.\n';
+  if (qrs === 'ancho') { interp += '⚠️ QRS ancho — Sospechar bloqueo de rama o TV (Taquicardia Ventricular).\n'; }
+  if (qrs === 'ancho' && fc === 'taqui') { interp += '🚨 TAQUICARDIA DE QRS ANCHO — Posible TV. Si inestable: cardioversión inmediata.\n'; urgente = true; }
+  if (st === 'elev') {
+    interp += '🚨 ELEVACIÓN ST — ACTIVAR CÓDIGO INFARTO (HEMOCOD) INMEDIATAMENTE. ECG 12 derivaciones urgente. Avisar médico YA.\n';
+    urgente = true;
+  }
+  if (st === 'desc') interp += '⚠️ Descenso ST — Posible isquemia subendocárdica. ECG seriado + enzimas cardíacas.\n';
+  if (st === 'iso') interp += '✓ Segmento ST isoeléctrico.\n';
+  if (estado === 'inestable') {
+    interp += '🚨 PACIENTE INESTABLE — Monitorización continua. Avisar médico URGENTE. Preparar carro de paradas.\n';
+    urgente = true;
+  }
+
+  box.style.borderColor = urgente ? '#ef4444' : 'var(--bdr2)';
+  box.style.background = urgente ? 'rgba(239,68,68,.07)' : '#0a0f24';
+  box.textContent = interp.trim() || 'Continúa seleccionando parámetros...';
+}
+
+function sendEcgToAi() {
+  const {fc, ritmo, qrs, ondap, st, estado} = ecgState;
+  const txt = `Analiza este ECG: FC=${fc||'?'}, Ritmo=${ritmo||'?'}, QRS=${qrs||'?'}, OndaP=${ondap||'?'}, ST=${st||'?'}, EstadoClínico=${estado||'?'}${attachedImgBase64 ? ' + imagen adjunta' : ''}. Dame interpretación clínica completa y actuación enfermera SESCAM.`;
+  togglePanel('ecg');
+  document.getElementById('inp').value = txt;
+  doSend();
+}
+
+function resetEcgPanel() {
+  Object.keys(ecgState).forEach(k => delete ecgState[k]);
+  document.querySelectorAll('.ecg-opt').forEach(b => b.classList.remove('active'));
+  const box = document.getElementById('ecg-res-box');
+  box.textContent = 'Selecciona los parámetros del ECG para obtener interpretación...';
+  box.style.color = 'var(--txt2)'; box.style.fontStyle = 'italic';
+  box.style.borderColor = 'var(--bdr2)'; box.style.background = '#0a0f24';
+  clearAttachedImg();
+}
+
+// ========== VADEMÉCUM — calcPed ==========
+function calcPed(kgStr) {
+  const kg = parseFloat(kgStr);
+  if (isNaN(kg) || kg <= 0) return;
+
+  document.querySelectorAll('.calc-val').forEach(span => {
+    const mult = parseFloat(span.dataset.mult);
+    const max = parseFloat(span.dataset.max);
+    const min = parseFloat(span.dataset.min);
+    if (isNaN(mult)) return;
+
+    let raw = kg * mult;
+    let capped = false;
+    if (!isNaN(max) && raw > max) { raw = max; capped = true; }
+    if (!isNaN(min) && raw < min) { raw = min; }
+
+    const decimals = raw < 1 ? 3 : raw < 10 ? 2 : 1;
+    span.textContent = raw.toFixed(decimals);
+    span.style.color = capped ? '#f87171' : '#34d399';
+
+    let badge = span.nextElementSibling;
+    if (badge && badge.classList.contains('cap-warn')) badge.remove();
+    if (capped) {
+      const b = document.createElement('span');
+      b.className = 'cap-warn'; b.textContent = `TOPE ${max}${span.dataset.unit||'mg'}`;
+      span.insertAdjacentElement('afterend', b);
+    }
+  });
+
+  const ipraEl = document.getElementById('p-ipra-val');
+  if (ipraEl) ipraEl.textContent = kg < 20 ? '250' : '500';
+
+  const glucaEl = document.getElementById('p-gluca-val');
+  if (glucaEl) glucaEl.textContent = kg < 25 ? '0.5' : '1';
+}
+
+// ========== VADEMÉCUM — filterPed ==========
+function filterPed(query) {
+  const q = query.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const hasQuery = q.length > 0;
+  const advTitle = document.getElementById('adv-title');
+
+  document.querySelectorAll('#vade-list .p-card').forEach(card => {
+    const name = (card.dataset.name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const line = card.dataset.line;
+    const matches = name.includes(q);
+
+    if (hasQuery) {
+      card.classList.toggle('hidden-card', !matches);
+    } else {
+      if (line === 'second') {
+        card.classList.add('hidden-card');
+      } else {
+        card.classList.remove('hidden-card');
+      }
+    }
+  });
+
+  if (advTitle) advTitle.classList.toggle('hidden-card', !hasQuery);
+}
+
+function resetPedPanel() {
+  document.getElementById('p-weight').value = '';
+  document.getElementById('p-search').value = '';
+  document.querySelectorAll('.calc-val').forEach(s => { s.textContent = '—'; s.style.color = '#34d399'; });
+  document.querySelectorAll('.cap-warn').forEach(b => b.remove());
+  filterPed('');
+}
+
+// ========== INIT ==========
+initKey();
+filterPed('');
+</script>
+
+</body>
+</html>
