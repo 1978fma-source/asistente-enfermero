@@ -1,200 +1,804 @@
-html = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#10243a">
-  <title>Estación Clínica de Guardia</title>
-  <style>
-    :root {
-      color-scheme: light;
-      --navy: #10243a;
-      --blue: #1769aa;
-      --bg: #f3f6fa;
-      --line: #dce4ed;
-      --text: #1d2b3a;
-      --muted: #64748b;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; background: var(--bg); color: var(--text);
-      font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-    }
-    button, input, textarea { font: inherit; }
-    button {
-      border: 0; border-radius: 9px; padding: 10px 14px;
-      background: var(--blue); color: white; cursor: pointer;
-    }
-    button.secondary { background: #e8eef5; color: var(--navy); }
-    button:hover { filter: brightness(.96); }
-    .topbar {
-      background: var(--navy); color: white; padding: 18px 22px;
-      display: flex; justify-content: space-between; align-items: center; gap: 12px;
-    }
-    .topbar h1 { margin: 0; font-size: 20px; }
-    .status { display: flex; align-items: center; gap: 8px; font-size: 13px; }
-    .sdot { width: 9px; height: 9px; border-radius: 50%; background: #22c55e; display: inline-block; }
-    .sdot.dok { background: #22c55e; }
-    main { width: min(1100px, 94%); margin: 22px auto 40px; }
-    .notice, .panel, .chat {
-      background: white; border: 1px solid var(--line); border-radius: 14px;
-      box-shadow: 0 3px 14px rgba(16,36,58,.05); margin-bottom: 16px;
-    }
-    .notice { padding: 12px 16px; color: var(--muted); font-size: 13px; }
-    .toolbar { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 14px; }
-    .panel { display: none; padding: 18px; }
-    .panel.show { display: block; }
-    .panel h2 { margin: 0 0 12px; font-size: 18px; }
-    .panel p { color: var(--muted); margin-top: 0; }
-    .options { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 14px; }
-    .ecg-opt { background: #e8eef5; color: var(--navy); }
-    .ecg-opt.active { background: var(--blue); color: white; }
-    #ecg-res-box {
-      white-space: pre-wrap; padding: 12px; background: #f5f8fb;
-      border: 1px solid var(--line); border-radius: 9px; min-height: 48px;
-    }
-    .chat { min-height: 300px; display: flex; flex-direction: column; overflow: hidden; }
-    #msgs { padding: 18px; flex: 1; min-height: 260px; overflow-y: auto; }
-    .welcome { text-align: center; padding: 28px 10px; color: var(--muted); }
-    .welcome strong { display: block; color: var(--navy); font-size: 20px; }
-    .welcome em { display: block; margin: 5px 0 12px; }
-    .chips { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-    .chip { border: 1px solid var(--line); border-radius: 20px; padding: 7px 12px; cursor: pointer; color: var(--blue); background: #f8fafc; }
-    .buser, .bbot { max-width: 88%; padding: 12px 14px; border-radius: 12px; margin: 10px 0; white-space: pre-wrap; }
-    .buser { margin-left: auto; background: #e7f1fb; }
-    .bbot { background: #f5f7fa; border: 1px solid var(--line); }
-    .buser img { display: block; max-width: 100%; max-height: 260px; margin-top: 8px; border-radius: 8px; }
-    .sec { padding: 9px 0; border-bottom: 1px solid var(--line); }
-    .sec:last-child { border-bottom: 0; }
-    .slbl { font-weight: 700; color: var(--navy); }
-    .ssub { font-weight: 400; color: var(--muted); font-size: 12px; margin-left: 6px; }
-    .stxt { margin-top: 4px; }
-    .composer { border-top: 1px solid var(--line); padding: 12px; display: flex; gap: 8px; align-items: end; }
-    .composer textarea { flex: 1; min-height: 44px; max-height: 140px; resize: vertical; border: 1px solid var(--line); border-radius: 9px; padding: 10px; }
-    .hidden { display: none !important; }
-    .hidden-card { display: none !important; }
-    .field { display: grid; gap: 6px; max-width: 320px; margin: 10px 0; }
-    .field input { padding: 10px; border: 1px solid var(--line); border-radius: 8px; }
-    #img-preview { max-width: 220px; max-height: 150px; border-radius: 8px; }
-    .p-card { padding: 10px; border: 1px solid var(--line); border-radius: 9px; margin: 8px 0; }
-    @media (max-width: 620px) {
-      .topbar { align-items: flex-start; flex-direction: column; }
-      .composer { flex-wrap: wrap; }
-      .composer textarea { flex-basis: 100%; }
-      .buser, .bbot { max-width: 100%; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Estación Clínica de Guardia · by Fernando</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap');
+
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  :root{
+    --bg:#050814;--sf:#0c122c;--sf2:#141d47;--inp:#1b265c;
+    --bdr:#26357a;--bdr2:#3a50b0;--txt:#e2e8f0;--txt2:#94a3b8;--acc:#3b82f6;
+    --usr:#0c1e45;
+    --c1:#ef4444;--c2:#10b981;--c3:#f59e0b;--c4:#f87171;
+    --font-sans: 'Inter', sans-serif;
+    --font-display: 'Syne', sans-serif;
+  }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--txt);
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  header {
+    background: var(--sf);
+    border-bottom: 1px solid var(--bdr);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 110;
+    flex-shrink: 0;
+    height: 56px;
+  }
+
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .logo { font-size: 20px; }
+  .title-box h1 { font-family: var(--font-display); font-size: 15px; font-weight: 800; letter-spacing: -0.5px; color: #fff; }
+  .title-box p { font-size: 10px; color: var(--acc); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .status-area { display: flex; align-items: center; gap: 12px; }
+  .sdot { width: 10px; height: 10px; border-radius: 50%; background: #475569; transition: background 0.3s; }
+  .dok { background: #10b981; box-shadow: 0 0 8px #10b981; }
+
+  .btn-top {
+    background: var(--sf2); border: 1px solid var(--bdr); color: #fff; padding: 6px 12px; border-radius: 6px;
+    font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;
+    transition: all 0.15s; user-select: none;
+  }
+  .btn-top:hover { background: var(--bdr); border-color: var(--bdr2); }
+
+  .main-container {
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: calc(100% - 56px);
+    overflow: hidden;
+  }
+
+  .chat-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    background: radial-gradient(circle at top right, rgba(12,18,44,0.5), transparent);
+    overflow: hidden;
+  }
+
+  .msgs-box {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .welcome { max-width: 500px; margin: 30px auto; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; animation: fadeIn 0.4s ease; }
+  .welcome strong { font-family: var(--font-display); font-size: 20px; color: #fff; letter-spacing: -0.5px; }
+  .welcome em { font-style: normal; font-size: 11px; color: var(--txt2); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .welcome p { font-size: 13px; color: var(--txt2); margin-top: 4px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; max-width: 400px; }
+  .chip { background: var(--sf); border: 1px solid var(--bdr); padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: all 0.15s; color: var(--txt); }
+  .chip:hover { border-color: var(--bdr2); background: var(--sf2); transform: translateY(-1px); }
+
+  .buser { align-self: flex-end; background: var(--usr); border: 1px solid var(--bdr); border-radius: 14px 14px 2px 14px; padding: 10px 14px; font-size: 14px; line-height: 1.4; max-width: 85%; color: #fff; word-break: break-word; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  .buser img { display: block; max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 8px; border: 1px solid rgba(255,255,255,0.1); }
+
+  .bbot { align-self: flex-start; width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 8px; animation: slideUp 0.25s ease; }
+
+  .sec { background: var(--sf); border: 1px solid var(--bdr); border-radius: 8px; padding: 12px 14px; position: relative; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  .sec::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; }
+  .slbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; width: 100%; }
+  .ssub { font-size: 9px; text-transform: none; font-weight: 500; color: var(--txt2); margin-left: auto; letter-spacing: 0; }
+  .stxt { font-size: 13.5px; line-height: 1.5; color: var(--txt); white-space: pre-wrap; }
+
+  .s1::before { background: var(--c1); } .s1 .slbl { color: var(--c1); }
+  .s2::before { background: var(--c2); } .s2 .slbl { color: var(--c2); }
+  .s3::before { background: var(--c3); } .s3 .slbl { color: var(--c3); }
+  .s4::before { background: var(--c4); } .s4 .slbl { color: var(--c4); }
+
+  .dose { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25); color: #fcd34d; padding: 1px 4px; border-radius: 4px; font-weight: 600; font-family: monospace; }
+
+  .input-container {
+    padding: 12px 16px;
+    background: var(--sf);
+    border-top: 1px solid var(--bdr);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  .bar-tools { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+  .left-tools { display: flex; gap: 8px; } .right-tools { display: flex; gap: 8px; }
+
+  .input-row { display: flex; gap: 8px; align-items: flex-end; background: var(--inp); border: 1px solid var(--bdr); border-radius: 10px; padding: 6px 10px; transition: border-color 0.15s; }
+  .input-row:focus-within { border-color: var(--bdr2); }
+
+  .input-row textarea {
+    flex-grow: 1; background: none; border: none; color: #fff; font-size: 14px; line-height: 1.4;
+    resize: none; max-height: 100px; height: 24px; font-family: var(--font-sans); outline: none; padding: 2px 0;
+  }
+
+  .btn-action { background: none; border: none; color: var(--txt2); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; flex-shrink: 0; }
+  .btn-action:hover { color: #fff; background: var(--sf2); }
+  .btn-send { background: var(--acc); color: #fff; } .btn-send:hover { background: #2563eb; }
+
+  .mic-btn.listening { background: #ef4444 !important; color: #fff !important; animation: pulse 1.5s infinite; }
+
+  .slide-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    max-width: 440px;
+    height: 100%;
+    background: var(--sf);
+    border-left: 1px solid var(--bdr);
+    box-shadow: -4px 0 24px rgba(0,0,0,0.5);
+    transform: translateX(100%);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 102;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .slide-panel.show { transform: translateX(0); }
+
+  .panel-header { padding: 14px 16px; border-bottom: 1px solid var(--bdr); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; height: 50px; background: var(--sf); }
+  .panel-header h2 { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: #fff; }
+
+  .panel-body {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .v-sect-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--acc);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 0 2px 0;
+  }
+
+  .ecg-grid { display: flex; flex-direction: column; gap: 12px; }
+  .ecg-row { display: flex; flex-direction: column; gap: 6px; }
+  .ecg-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--txt2); letter-spacing: 0.5px; }
+
+  .ecg-opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .ecg-opt { background: var(--inp); border: 1px solid var(--bdr); color: var(--txt); padding: 8px 4px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.1s; user-select: none; }
+  .ecg-opt:hover { border-color: var(--bdr2); background: var(--sf2); }
+  .ecg-opt.active { background: var(--acc); border-color: var(--acc); color: #fff; box-shadow: 0 0 8px rgba(59,130,246,0.4); }
+
+  .ecg-res-box { background: #0a0f24; border: 1px dashed var(--bdr2); border-radius: 8px; padding: 12px; font-size: 12.5px; line-height: 1.4; white-space: pre-wrap; min-height: 60px; flex-shrink: 0; }
+
+  .img-preview-box { display: none; position: relative; width: 100%; border-radius: 6px; overflow: hidden; border: 1px solid var(--bdr); margin-top: 4px; flex-shrink: 0; }
+  .img-preview-box img { display: block; width: 100%; max-height: 120px; object-fit: cover; }
+  .btn-del-img { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.7); color: #fff; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+
+  .p-search-row { display: flex; gap: 8px; position: sticky; top: 0; background: var(--sf); padding-bottom: 4px; z-index: 10; flex-shrink: 0; }
+  .p-search-row input { background: var(--inp); border: 1px solid var(--bdr); border-radius: 6px; padding: 8px 12px; color: #fff; font-size: 13px; outline: none; width: 100%; }
+  .p-search-row input:focus { border-color: var(--bdr2); }
+
+  .p-card { background: var(--sf2); border: 1px solid var(--bdr); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px; transition: border-color 0.15s; flex-shrink: 0; }
+  .p-card:hover { border-color: var(--bdr2); }
+  .p-head { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 4px; }
+  .p-card strong { font-size: 14px; color: #fff; }
+  .p-adm { font-size: 10px; font-weight: 700; background: var(--bdr); color: var(--txt); padding: 1px 5px; border-radius: 4px; text-transform: uppercase; margin-left: auto; }
+  .route-block { font-size: 12.5px; color: var(--txt); padding: 2px 0; }
+  .dilution-block { font-size: 11px; color: var(--txt2); background: rgba(0,0,0,0.2); padding: 6px; border-radius: 4px; border-left: 2px solid var(--bdr2); margin-top: 2px; }
+
+  .hidden-card { display: none !important; }
+
+  .panel-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 12px; flex-shrink: 0; background: var(--sf); position: sticky; bottom: 0; }
+
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  @keyframes slideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(239,68,68,0.5)} 70% {box-shadow: 0 0 0 8px rgba(239,68,68,0)} 100% {box-shadow: 0 0 0 0 rgba(239,68,68,0)} }
+
+  @media(max-width:600px){
+    .slide-panel { max-width: 100%; border-left: none; }
+    .welcome { margin: 15px auto; }
+    .welcome strong { font-size: 18px; }
+    .buser, .bbot { max-width: 95%; }
+    .ecg-opts { grid-template-columns: repeat(2, 1fr); }
+    .panel-body { padding: 12px; gap: 12px; }
+    .input-container { padding: 8px 12px; }
+  }
+</style>
 </head>
 <body>
-  <header class="topbar">
-    <h1>Estación Clínica de Guardia</h1>
-    <div class="status"><span id="sdot" class="sdot dok"></span><span>Modo local</span></div>
-  </header>
 
-  <main>
-    <div id="key-banner" class="notice">
-      Funcionamiento local: no se utiliza una API externa.
-      <span id="key-set" class="hidden"></span>
-      <button class="secondary" type="button" onclick="changeKey()">Configuración</button>
-      <button class="secondary" type="button" onclick="saveKey()">Cerrar aviso</button>
+<header>
+  <div class="brand">
+    <span class="logo">🩺</span>
+    <div class="title-box">
+      <h1>Estación Clínica de Guardia</h1>
+      <p>by Fernando · MODO LOCAL RÁPIDO</p>
     </div>
+  </div>
+  <div class="status-area">
+    <span style="font-size:11px;color:#86efac;font-weight:600;">Local activo</span>
+    <div class="sdot dok" id="sdot"></div>
+    <button class="btn-top" onclick="clearScreen()">🗑️ Limpiar</button>
+  </div>
+</header>
 
-    <nav class="toolbar" aria-label="Herramientas">
-      <button type="button" onclick="togglePanel('ecg')">Panel de ECG</button>
-      <button type="button" onclick="togglePanel('vade')">Vademécum pediátrico</button>
-      <button type="button" class="secondary" onclick="clearScreen()">Limpiar conversación</button>
-    </nav>
+<div class="main-container">
+  <div class="chat-area">
+    <div class="msgs-box" id="msgs">
 
-    <section id="ecg-panel" class="panel">
-      <h2>Valoración orientativa de ECG</h2>
-      <p>Selecciona los parámetros disponibles. Esta herramienta no sustituye la valoración clínica ni la interpretación profesional del trazado.</p>
-      <strong>Frecuencia cardíaca</strong>
-      <div class="options">
-        <button class="ecg-opt" data-param="fc" data-val="Bradicardia" onclick="setEcg(this)">Bradicardia</button>
-        <button class="ecg-opt" data-param="fc" data-val="Normal" onclick="setEcg(this)">Normal</button>
-        <button class="ecg-opt" data-param="fc" data-val="Taquicardia" onclick="setEcg(this)">Taquicardia</button>
-      </div>
-      <strong>Ritmo</strong>
-      <div class="options">
-        <button class="ecg-opt" data-param="ritmo" data-val="Regular" onclick="setEcg(this)">Regular</button>
-        <button class="ecg-opt" data-param="ritmo" data-val="Irregular" onclick="setEcg(this)">Irregular</button>
-        <button class="ecg-opt" data-param="ritmo" data-val="Fibrilación auricular posible" onclick="setEcg(this)">Irregular sinusal/FA posible</button>
-      </div>
-      <strong>QRS</strong>
-      <div class="options">
-        <button class="ecg-opt" data-param="qrs" data-val="Estrecho" onclick="setEcg(this)">Estrecho</button>
-        <button class="ecg-opt" data-param="qrs" data-val="Ancho" onclick="setEcg(this)">Ancho</button>
-      </div>
-      <strong>Onda P</strong>
-      <div class="options">
-        <button class="ecg-opt" data-param="ondap" data-val="Visible" onclick="setEcg(this)">Visible</button>
-        <button class="ecg-opt" data-param="ondap" data-val="No visible" onclick="setEcg(this)">No visible</button>
-      </div>
-      <strong>Segmento ST</strong>
-      <div class="options">
-        <button class="ecg-opt" data-param="st" data-val="Sin elevación" onclick="setEcg(this)">Sin elevación</button>
-        <button class="ecg-opt" data-param="st" data-val="elev" onclick="setEcg(this)">Elevación</button>
-        <button class="ecg-opt" data-param="st" data-val="Descenso" onclick="setEcg(this)">Descenso</button>
-      </div>
-      <strong>Estado clínico</strong>
-      <div class="options">
-        <button class="ecg-opt" data-param="estado" data-val="estable" onclick="setEcg(this)">Estable</button>
-        <button class="ecg-opt" data-param="estado" data-val="inestable" onclick="setEcg(this)">Inestable</button>
-      </div>
-      <div id="ecg-res-box">Selecciona los parámetros del ECG para obtener interpretación...</div>
-      <div class="field">
-        <label for="ecg-img-file">Adjuntar imagen de ECG</label>
-        <input id="ecg-img-file" type="file" accept="image/*" onchange="previewEcgImg(this)">
-        <div id="img-preview-box" style="display:none">
-          <img id="img-preview" alt="Vista previa del ECG">
-          <button type="button" class="secondary" onclick="clearAttachedImg()">Quitar imagen</button>
+      <div class="welcome" id="welcome">
+        <div style="font-size:32px;margin-bottom:10px">🚑</div>
+        <strong>Estación Clínica de Guardia</strong>
+        <em>Desarrollado por Fernando · Entorno Clínico de Soporte</em>
+        <p>Selecciona un caso rápido o usa los paneles de ECG y Vademécum Pediátrico.</p>
+        <div class="chips">
+          <div class="chip" onclick="chip('Paciente con dolor torácico agudo')">Dolor torácico</div>
+          <div class="chip" onclick="chip('Código Sepsis criterios de actuación')">Código Sepsis</div>
+          <div class="chip" onclick="chip('PCR adulto algoritmo de actuación SVB SVA')">PCR / RCP</div>
+          <div class="chip" onclick="chip('Shock anafiláctico manejo y dosis')">Anafilaxia</div>
         </div>
       </div>
-      <div class="toolbar">
-        <button type="button" onclick="sendEcgToAi()">Enviar valoración</button>
-        <button type="button" class="secondary" onclick="resetEcgPanel()">Restablecer</button>
-      </div>
-    </section>
 
-    <section id="vade-panel" class="panel">
-      <h2>Vademécum pediátrico</h2>
-      <p>El archivo recibido no contenía fichas de medicamentos ni sus datos de dosificación. Se deja el panel preparado, sin inventar dosis ni pautas.</p>
-      <label class="field">Peso del paciente (kg)
-        <input type="number" min="0" step="0.1" placeholder="Introduce el peso" oninput="calcPed(this.value)">
-      </label>
-      <input type="search" placeholder="Buscar medicamento (cuando se incorporen las fichas)" oninput="filterPed(this.value)" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px">
-      <div id="adv-title" class="hidden-card">Fichas disponibles</div>
-      <div id="vade-list">
-        <div class="p-card" data-line="first" data-name="pendiente">No hay fichas de medicamentos en el archivo original.</div>
-      </div>
-      <p>Los resultados de cálculo solo serán válidos cuando se incorporen las fichas, concentraciones, límites y protocolos correspondientes.</p>
-    </section>
+    </div>
 
-    <section class="chat" aria-label="Asistente clínico">
-      <div id="msgs">
-        <div class="welcome" id="welcome">
-          <div style="font-size:32px;margin-bottom:10px">🚑</div>
-          <strong>Estación Clínica de Guardia</strong>
-          <em>Desarrollado por Fernando · Modo Local Rápido</em>
-          <p>Selecciona un caso rápido o usa los paneles de ECG y Vademécum Pediátrico.</p>
-          <div class="chips">
-            <div class="chip" onclick="chip('Paciente con dolor torácico agudo')">Dolor torácico</div>
-            <div class="chip" onclick="chip('Código Sepsis criterios de actuación')">Código Sepsis</div>
-            <div class="chip" onclick="chip('PCR adulto algoritmo de actuación SVB SVA')">PCR / RCP</div>
-            <div class="chip" onclick="chip('Shock anafiláctico manejo y dosis')">Anafilaxia</div>
+    <div class="input-container">
+      <div class="input-row">
+        <textarea id="inp" placeholder="Escribe o usa el dictado de voz..." rows="1"></textarea>
+        <button class="btn-action btn-send" onclick="doSend()">➔</button>
+      </div>
+      <div class="bar-tools">
+        <div class="left-tools">
+          <button class="btn-top" onclick="togglePanel('ecg')">📊 Calculador ECG / Fotos</button>
+          <button class="btn-top" onclick="togglePanel('vade')">👶 Vademécum Pediátrico</button>
+        </div>
+        <div class="right-tools">
+          <button class="btn-action mic-btn" id="mic-btn" onclick="toggleVoice()">🎙️</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-panel" id="ecg-panel">
+    <div class="panel-header">
+      <h2>Módulo Interactivo ECG</h2>
+      <button class="btn-top" onclick="togglePanel('ecg')">Cerrar ✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="ecg-grid">
+        <div class="ecg-row">
+          <div class="ecg-label">Frecuencia Cardíaca</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="fc" data-val="bradi" onclick="setEcg(this)">Bradicardia &lt;60</button>
+            <button class="ecg-opt" data-param="fc" data-val="normo" onclick="setEcg(this)">Normal 60-100</button>
+            <button class="ecg-opt" data-param="fc" data-val="taqui" onclick="setEcg(this)">Taquicardia &gt;100</button>
+          </div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Ritmo (Regularidad)</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="ritmo" data-val="regular" onclick="setEcg(this)">Regular</button>
+            <button class="ecg-opt" data-param="ritmo" data-val="irregular" onclick="setEcg(this)">Irregular</button>
+          </div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Complejo QRS</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="qrs" data-val="estrecho" onclick="setEcg(this)">Estrecho (&lt;0.12s)</button>
+            <button class="ecg-opt" data-param="qrs" data-val="ancho" onclick="setEcg(this)">Ancho (≥0.12s)</button>
+          </div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Onda P</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="ondap" data-val="presente" onclick="setEcg(this)">Presente</button>
+            <button class="ecg-opt" data-param="ondap" data-val="ausente" onclick="setEcg(this)">Ausente / No visible</button>
+          </div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Segmento ST</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="st" data-val="iso" onclick="setEcg(this)">Isoeléctrico</button>
+            <button class="ecg-opt" data-param="st" data-val="elev" onclick="setEcg(this)">🚨 ELEVACIÓN ST</button>
+            <button class="ecg-opt" data-param="st" data-val="desc" onclick="setEcg(this)">Descenso ST</button>
+          </div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Estado del Paciente</div>
+          <div class="ecg-opts">
+            <button class="ecg-opt" data-param="estado" data-val="estable" onclick="setEcg(this)">Estable</button>
+            <button class="ecg-opt" data-param="estado" data-val="inestable" onclick="setEcg(this)">🚨 INESTABLE</button>
           </div>
         </div>
       </div>
-      <div class="composer">
-        <textarea id="inp" rows="2" placeholder="Escribe una consulta clínica..."></textarea>
-        <button id="mic-btn" type="button" class="secondary" onclick="toggleVoice()" title="Dictado por voz">Micrófono</button>
-        <button type="button" onclick="doSend()">Enviar</button>
-      </div>
-    </section>
-    <div class="notice">Herramienta de apoyo educativo. Verifica siempre las actuaciones, dosis y protocolos con las guías vigentes y los procedimientos de tu centro.</div>
-  </main>
 
-""" + script + """
+      <div class="ecg-label">Analizar por Foto (Cámara / Galería)</div>
+      <div style="background:var(--inp);border:1px solid var(--bdr);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:8px;flex-shrink:0">
+        <input type="file" id="ecg-img-file" accept="image/*" onchange="previewEcgImg(this)" style="font-size:12px;color:var(--txt2)">
+        <div class="img-preview-box" id="img-preview-box">
+          <button class="btn-del-img" onclick="clearAttachedImg()">✕</button>
+          <img id="img-preview" src="" alt="Previsualización">
+        </div>
+      </div>
+
+      <div class="ecg-label">Interpretación del Algoritmo</div>
+      <div class="ecg-res-box" id="ecg-res-box">Selecciona los parámetros del ECG para obtener interpretación...</div>
+
+      <div class="panel-actions">
+        <button class="btn-top" style="flex-grow:1;background:#1e293b;justify-content:center;padding:12px" onclick="resetEcgPanel()">Reiniciar Panel</button>
+        <button class="btn-top" style="flex-grow:2;background:var(--acc);border-color:var(--acc);justify-content:center;padding:12px" onclick="sendEcgToAi()">Enviar al Registro ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-panel" id="vade-panel">
+    <div class="panel-header">
+      <h2>Vademécum Pediátrico · by Fernando</h2>
+      <button class="btn-top" onclick="togglePanel('vade')">Cerrar ✕</button>
+    </div>
+    <div class="panel-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;flex-shrink:0">
+        <div class="ecg-row">
+          <div class="ecg-label">Peso del Niño (kg)</div>
+          <div class="p-search-row" style="padding:0;"><input type="number" id="p-weight" placeholder="Ej: 14" step="0.5" oninput="calcPed(this.value)"></div>
+        </div>
+        <div class="ecg-row">
+          <div class="ecg-label">Filtrar Fármaco</div>
+          <div class="p-search-row" style="padding:0;"><input type="text" id="p-search" placeholder="Buscar..." oninput="filterPed(this.value)"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;" id="vade-list">
+
+        <div class="v-sect-title" id="main-ped-title">⭐ Primera Línea — Urgencias Frecuentes</div>
+
+        <div class="p-card" data-name="adrenalina epinefrina anafilaxia shock rcp paro" data-line="first">
+          <div class="p-head"><strong>Adrenalina / Epinefrina</strong><span class="p-adm">IM / IV / NEB</span></div>
+          <small style="color:var(--txt2)">Paro Cardiorrespiratorio (PCR) · Anafilaxia · Estridor</small>
+          <div class="route-block">■ IM Anafilaxia (<span class="dose">0.01 mg/kg</span>): <span class="calc-val" data-mult="0.01" data-max="0.5" data-unit="mg">—</span> mg · Sin diluir (1mg/ml)</div>
+          <div class="route-block">■ IV/IO RCP (<span class="dose">0.1 ml/kg 1:10k</span>): <span class="calc-val" data-mult="0.1" data-max="10" data-unit="ml">—</span> ml de la dilución</div>
+          <div class="route-block">■ Nebulizada Estridor (<span class="dose">0.5 mg/kg</span>): <span class="calc-val" data-mult="0.5" data-max="5" data-unit="mg">—</span> mg (ó ml) directo</div>
+          <div class="dilution-block">🧪 RCP: 1amp (1mg) + 9cc SF (1:10.000). Anafilaxia: IM profunda en cara anterolateral del muslo.</div>
+        </div>
+
+        <div class="p-card" data-name="amoxicilina clavulanico antibiotico infeccion" data-line="first">
+          <div class="p-head"><strong>Amoxicilina-Clavulánico</strong><span class="p-adm">IV / VO</span></div>
+          <small style="color:var(--txt2)">Antibioterapia empírica de amplio espectro</small>
+          <div class="route-block">■ IV Infusión (<span class="dose">30 mg/kg</span>): <span class="calc-val" data-mult="30" data-max="1200" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Máx 1200 mg. Reconstituir e infundir diluido en 50-100 ml de SF a pasar en 30-40 minutos.</div>
+        </div>
+
+        <div class="p-card" data-name="atropina bradicardia vagal rcp" data-line="first">
+          <div class="p-head"><strong>Atropina</strong><span class="p-adm">IV / IO</span></div>
+          <small style="color:var(--txt2)">Bradicardia sintomática / Secuencia de Intubación Rápida (SIR)</small>
+          <div class="route-block">■ IV/IO (<span class="dose">0.02 mg/kg</span>): <span class="calc-val" data-mult="0.02" data-max="0.5" data-min="0.1" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Mínimo 0.1 mg y Máximo 0.5 mg por dosis. Bólido rápido.</div>
+        </div>
+
+        <div class="p-card" data-name="dexametasona crup laringitis asma" data-line="first">
+          <div class="p-head"><strong>Dexametasona</strong><span class="p-adm">VO / IM / IV</span></div>
+          <small style="color:var(--txt2)">Crup laringitis aguda · Edema de vía aérea</small>
+          <div class="route-block">■ VO/IM/IV (<span class="dose">0.6 mg/kg</span>): <span class="calc-val" data-mult="0.6" data-max="12" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Tope seguro 12 mg. Revisar presentación y vía indicada según protocolo.</div>
+        </div>
+
+        <div class="p-card" data-name="ibuprofeno fiebre dolor antiinflamatorio" data-line="first">
+          <div class="p-head"><strong>Ibuprofeno</strong><span class="p-adm">VO</span></div>
+          <small style="color:var(--txt2)">Fiebre moderada-alta · Dolor osteomuscular o inflamatorio</small>
+          <div class="route-block">■ VO (<span class="dose">10 mg/kg</span>): <span class="calc-val" data-mult="10" data-max="400" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Máx 400 mg/dosis. Comprobar concentración de suspensión oral antes de calcular ml.</div>
+        </div>
+
+        <div class="p-card" data-name="midazolam convulsion status sedacion" data-line="first">
+          <div class="p-head"><strong>Midazolam</strong><span class="p-adm">IV / IN / BUC</span></div>
+          <small style="color:var(--txt2)">Crisis convulsiva aguda · Sedación en procedimientos</small>
+          <div class="route-block">■ IV/IO (<span class="dose">0.1 mg/kg</span>): <span class="calc-val" data-mult="0.1" data-max="5" data-unit="mg">—</span> mg</div>
+          <div class="route-block">■ Intranasal/Bucal (<span class="dose">0.2 mg/kg</span>): <span class="calc-val" data-mult="0.2" data-max="10" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Máx IV 5 mg; IN 10 mg. Monitorizar saturación y disponer de soporte de vía aérea.</div>
+        </div>
+
+        <div class="p-card" data-name="ondansetron vomitos nauseas gastroenteritis gea" data-line="first">
+          <div class="p-head"><strong>Ondansetrón</strong><span class="p-adm">VO / IV</span></div>
+          <small style="color:var(--txt2)">Antiemético en Gastroenteritis Aguda (GEA)</small>
+          <div class="route-block">■ VO/IV Lento (<span class="dose">0.15 mg/kg</span>): <span class="calc-val" data-mult="0.15" data-max="8" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Máximo absoluto 8 mg. Esperar intervalo prudencial antes de probar tolerancia oral.</div>
+        </div>
+
+        <div class="p-card" data-name="paracetamol fiebre dolor analgesia" data-line="first">
+          <div class="p-head"><strong>Paracetamol</strong><span class="p-adm">VO / IV</span></div>
+          <small style="color:var(--txt2)">Fiebre · Dolor leve-moderado de primera línea</small>
+          <div class="route-block">■ VO (<span class="dose">15 mg/kg</span>): <span class="calc-val" data-mult="15" data-max="1000" data-unit="mg">—</span> mg</div>
+          <div class="route-block">■ IV Infusión (<span class="dose">15 mg/kg</span>): <span class="calc-val" data-mult="15" data-max="1000" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Comprobar presentación (ml/gotas/solución IV) y respetar intervalo mínimo entre tomas.</div>
+        </div>
+
+        <div class="p-card" data-name="prednisolona asma bronquitis corticoide" data-line="first">
+          <div class="p-head"><strong>Prednisolona</strong><span class="p-adm">VO</span></div>
+          <small style="color:var(--txt2)">Crisis asmática · Broncoespasmo agudo moderado</small>
+          <div class="route-block">■ VO (<span class="dose">1 mg/kg</span>): <span class="calc-val" data-mult="1" data-max="40" data-unit="mg">—</span> mg</div>
+          <div class="dilution-block">🧪 Comprobar equivalencia de gotas o solución oral y dosis máxima diaria recomendada.</div>
+        </div>
+
+        <div class="p-card" data-name="salbutamol broncoespasmo asma sibilancias inhalador" data-line="first">
+          <div class="p-head"><strong>Salbutamol</strong><span class="p-adm">NEB / INH</span></div>
+          <small style="color:var(--txt2)">Crisis asmática · Bronquitis · Sibilancias</small>
+          <div class="route-block">■ Nebulizado (<span class="dose">0.15 mg/kg</span>): <span class="calc-val" data-mult="0.15" data-max="5" data-min="1.25" data-unit="mg">—</span> mg</div>
+          <div class="route-block">■ Inhalado (MDI): <span class="dose">2-10 pufs</span> con cámara espaciadora según gravedad.</div>
+          <div class="dilution-block">🧪 Nebulizado: Mín 1.25 mg, Máx 5 mg. Enrasar con SF hasta 4 ml totales. Flujo de O2 a 6-8 L/min.</div>
+        </div>
+
+        <div class="v-sect-title hidden-card" id="adv-title">📦 Farmacia Completa (Urgencias Especializadas y Críticos)</div>
+
+        <div class="p-card hidden-card" data-name="adenosina tpsv taquicardia supraventricular ritmo" data-line="second">
+          <div class="p-head"><strong>Adenosina</strong><span class="p-adm">IV BOLO</span></div>
+          <small style="color:var(--txt2)">Taquicardia Supraventricular (TPSV)</small>
+          <div class="route-block">■ IV Bolo rápido (<span class="dose">0.1 mg/kg</span>): <span class="calc-val" data-mult="0.1" data-max="6" data-unit="mg">—</span> mg · 1ª Dosis</div>
+          <div class="route-block">■ IV 2ª Dosis (<span class="dose">0.2 mg/kg</span>): <span class="calc-val" data-mult="0.2" data-max="12" data-unit="mg">—</span> mg · Si no revierte</div>
+          <div class="dilution-block">🧪 Bolo rápido en vena proximal seguido de lavado con SF. Monitorización ECG continua.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="amiodarona antiarritmico rcp fv tv" data-line="second">
+          <div class="p-head"><strong>Amiodarona</strong><span class="p-adm">IV PERF</span></div>
+          <small style="color:var(--txt2)">Arritmias ventriculares · FV/TV sin pulso refractaria</small>
+          <div class="route-block">■ IV/IO Bolo RCP (<span class="dose">5 mg/kg</span>): <span class="calc-val" data-mult="5" data-max="300" data-unit="mg">—</span> mg</div>
+          <div class="route-block">■ IV Infusión (Arritmias): Diluir según ficha técnica y protocolo.</div>
+          <div class="dilution-block">🧪 Monitorizar TA y ECG de forma continua por riesgo de hipotensión y alteraciones de conducción.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="acido valproico anticonvulsivante crisis epilepsia" data-line="second">
+          <div class="p-head"><strong>Ácido Valproico IV</strong><span class="p-adm">IV</span></div>
+          <small style="color:var(--txt2)">Estatus epiléptico / Segunda línea anticonvulsivante</small>
+          <div class="route-block">■ IV Directo (<span class="dose">25 mg/kg</span>): <span class="calc-val" data-mult="25" data-max="1500" data-unit="mg">—</span> mg · Carga</div>
+          <div class="dilution-block">🧪 Diluir según ficha técnica y administrar de forma controlada en varios minutos.</div>
+        </div>
+
+        <div class="p-card hidden-card" data-name="bicarbonato sodico acidosis hiperpotasemia rcp" data-line="second">
+          <div class="p-head"><strong>Bicarbonato Sódico 1 Molar (1 mEq/ml)</strong><span class="p-adm">IV / IO</span></div>
+          <small style="color:var(--txt2)">Acidosis metabólica severa · Hiperpotasemia · RCP prolongada</small>
+          <div class="route-block">■ IV/IO Lento (<span class="dose">1 mEq/kg</span>): <span class="calc-val" data-mult="1" data-max="50" data-unit="mEq">—</span> mEq (ó ml)</div>
+          <div class="dilution-block">🧪 Administrar lentamente y revisar compatibilidades de vía antes de infundir.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const ecgState = {
+    fc: null,
+    ritmo: null,
+    qrs: null,
+    ondap: null,
+    st: null,
+    estado: null
+  };
+
+  let attachedImgData = null;
+  let recognition = null;
+  let isListening = false;
+
+  const GUIAS_FIJAS = {
+    torax: {
+      titulo: "Dolor torácico agudo",
+      inmediato: "Monitorización ECG, TA, FC y SatO2; acceso venoso periférico; reposo y valoración de constantes.",
+      cuidados: "ECG de 12 derivaciones lo antes posible y revisión de signos de alarma o inestabilidad.",
+      farmacos: "Oxigenoterapia según indicación/saturación y tratamiento pautado según protocolo vigente.",
+      alertas: "Signos de inestabilidad hemodinámica, disnea grave, síncope, arritmias o cambios en el ST."
+    },
+    sepsis: {
+      titulo: "Código Sepsis · Criterios y actuación inicial",
+      inmediato: "Valoración ABCDE, toma de constantes completas, glucemia capilar y canalización de vía venosa.",
+      cuidados: "Extracción de muestras/cultivos según protocolo sin demorar el inicio terapéutico indicado; control de diuresis.",
+      farmacos: "Fluidoterapia y antibioterapia empírica según prescripción médica y protocolo del centro.",
+      alertas: "Hipotensión mantenida, lactato elevado, oliguria, alteración del nivel de conciencia o taquipnea marcada."
+    },
+    rcp: {
+      titulo: "PCR adulto · Algoritmo SVB / SVA",
+      inmediato: "Comprobar respuesta y respiración normal; activar equipo/emergencias y solicitar desfibrilador.",
+      cuidados: "Compresiones torácicas de alta calidad (100-120/min, profundidad ~5-6 cm, mínima interrupción) y ventilaciones.",
+      farmacos: "Adrenalina y fármacos indicados según ritmo y pauta de soporte vital avanzado.",
+      alertas: "Reevaluación de ritmo en ventana programada, rotación de reanimadores y revisión de causas reversibles."
+    },
+    anafilaxia: {
+      titulo: "Shock anafiláctico · Manejo y dosis",
+      inmediato: "Retirar desencadenante si es visible, colocar al paciente en posición adecuada y monitorizar.",
+      cuidados: "Vía aérea permeable, oxígeno si precisa y accesos venosos si hay signos de compromiso sistémico.",
+      farmacos: "Adrenalina intramuscular según protocolo/dosis pautada y soporte complementario según indicación.",
+      alertas: "Estridor, broncoespasmo severo, hipotensión o vigilancia ante posible recurrencia."
+    },
+    general: {
+      titulo: "Consulta rápida · Modo local sin IA",
+      inmediato: "Aplicación en modo local fijo (sin API externa). Revisa constantes, valoración inicial y paneles laterales.",
+      cuidados: "Usa los accesos rápidos de Dolor torácico, Código Sepsis, PCR / RCP o Anafilaxia para ver puntos clave.",
+      farmacos: "Comprueba siempre dosis, concentraciones y protocolos vigentes de tu unidad o prescripción médica.",
+      alertas: "Reevaluar cambios bruscos en constantes, dolor, nivel de conciencia o perfusión."
+    }
+  };
+
+  function chip(text) {
+    const inp = document.getElementById('inp');
+    if (inp) inp.value = text;
+    doSend();
+  }
+
+  function togglePanel(which) {
+    const ecg = document.getElementById('ecg-panel');
+    const vade = document.getElementById('vade-panel');
+    if (which === 'ecg') {
+      ecg.classList.toggle('show');
+      vade.classList.remove('show');
+    } else if (which === 'vade') {
+      vade.classList.toggle('show');
+      ecg.classList.remove('show');
+    }
+  }
+
+  function setEcg(btn) {
+    const param = btn.getAttribute('data-param');
+    const val = btn.getAttribute('data-val');
+    document.querySelectorAll(`.ecg-opt[data-param="${param}"]`).forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    ecgState[param] = val;
+    renderEcgSummary();
+  }
+
+  function renderEcgSummary() {
+    const box = document.getElementById('ecg-res-box');
+    if (!box) return;
+
+    const partes = [];
+    if (ecgState.fc) partes.push(`FC: ${ecgState.fc}`);
+    if (ecgState.ritmo) partes.push(`Ritmo: ${ecgState.ritmo}`);
+    if (ecgState.qrs) partes.push(`QRS: ${ecgState.qrs}`);
+    if (ecgState.ondap) partes.push(`Onda P: ${ecgState.ondap}`);
+    if (ecgState.st) partes.push(`ST: ${ecgState.st}`);
+    if (ecgState.estado) partes.push(`Estado: ${ecgState.estado}`);
+
+    if (!partes.length) {
+      box.textContent = 'Selecciona los parámetros del ECG para obtener interpretación...';
+      return;
+    }
+
+    let alerta = 'Revisión sistemática de frecuencia, ritmo, QRS, onda P y segmento ST.';
+    if (ecgState.estado === 'inestable' || ecgState.st === 'elev') {
+      alerta = 'PRIORIDAD ALTA: Valorar estabilidad clínica, monitorización continua y aviso/activación inmediata.';
+    }
+
+    box.textContent = `Parámetros: ${partes.join(' · ')}\n\nOrientación: ${alerta}`;
+  }
+
+  function previewEcgImg(input) {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      attachedImgData = e.target.result;
+      const img = document.getElementById('img-preview');
+      const box = document.getElementById('img-preview-box');
+      if (img && box) {
+        img.src = attachedImgData;
+        box.style.display = 'block';
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearAttachedImg() {
+    attachedImgData = null;
+    const fileInput = document.getElementById('ecg-img-file');
+    const img = document.getElementById('img-preview');
+    const box = document.getElementById('img-preview-box');
+    if (fileInput) fileInput.value = '';
+    if (img) img.src = '';
+    if (box) box.style.display = 'none';
+  }
+
+  function resetEcgPanel() {
+    Object.keys(ecgState).forEach(k => { ecgState[k] = null; });
+    document.querySelectorAll('.ecg-opt').forEach(b => b.classList.remove('active'));
+    clearAttachedImg();
+    renderEcgSummary();
+  }
+
+  function sendEcgToAi() {
+    const boxText = document.getElementById('ecg-res-box')?.textContent || 'ECG seleccionado';
+    togglePanel('ecg');
+    appendUserMessage(boxText, attachedImgData);
+    appendBotGuide(GUIAS_FIJAS.torax);
+  }
+
+  function buscarGuiaLocal(texto) {
+    const t = (texto || '').toLowerCase();
+    if (t.includes('torác') || t.includes('torac') || t.includes('pecho') || t.includes('ecg')) return GUIAS_FIJAS.torax;
+    if (t.includes('sepsis')) return GUIAS_FIJAS.sepsis;
+    if (t.includes('pcr') || t.includes('rcp') || t.includes('paro')) return GUIAS_FIJAS.rcp;
+    if (t.includes('anafil') || t.includes('shock')) return GUIAS_FIJAS.anafilaxia;
+    return {
+      ...GUIAS_FIJAS.general,
+      titulo: `Consulta: ${texto || 'Registro rápido'}`
+    };
+  }
+
+  function appendUserMessage(text, imgSrc) {
+    const welcome = document.getElementById('welcome');
+    if (welcome) welcome.remove();
+
+    const msgs = document.getElementById('msgs');
+    const div = document.createElement('div');
+    div.className = 'buser';
+    div.textContent = text;
+    if (imgSrc) {
+      const img = document.createElement('img');
+      img.src = imgSrc;
+      div.appendChild(img);
+    }
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function appendBotGuide(g) {
+    const msgs = document.getElementById('msgs');
+    const bot = document.createElement('div');
+    bot.className = 'bbot';
+    bot.innerHTML = `
+      <div class="sec s1"><div class="slbl">1. Actuación inmediata <span class="ssub">${g.titulo}</span></div><div class="stxt">${g.inmediato}</div></div>
+      <div class="sec s2"><div class="slbl">2. Cuidados y monitorización</div><div class="stxt">${g.cuidados}</div></div>
+      <div class="sec s3"><div class="slbl">3. Fármacos y soporte</div><div class="stxt">${g.farmacos}</div></div>
+      <div class="sec s4"><div class="slbl">4. Signos de alarma</div><div class="stxt">${g.alertas}</div></div>
+    `;
+    msgs.appendChild(bot);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function clearScreen() {
+    const msgs = document.getElementById('msgs');
+    if (!msgs) return;
+    msgs.innerHTML = `
+      <div class="welcome" id="welcome">
+        <div style="font-size:32px;margin-bottom:10px">🚑</div>
+        <strong>Estación Clínica de Guardia</strong>
+        <em>Desarrollado por Fernando · Modo Local Rápido</em>
+        <p>Selecciona un caso rápido o usa los paneles de ECG y Vademécum Pediátrico.</p>
+        <div class="chips">
+          <div class="chip" onclick="chip('Paciente con dolor torácico agudo')">Dolor torácico</div>
+          <div class="chip" onclick="chip('Código Sepsis criterios de actuación')">Código Sepsis</div>
+          <div class="chip" onclick="chip('PCR adulto algoritmo de actuación SVB SVA')">PCR / RCP</div>
+          <div class="chip" onclick="chip('Shock anafiláctico manejo y dosis')">Anafilaxia</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function doSend() {
+    const inp = document.getElementById('inp');
+    if (!inp) return;
+    const text = inp.value.trim();
+    if (!text && !attachedImgData) return;
+
+    appendUserMessage(text || 'Adjunto clínico', attachedImgData);
+    inp.value = '';
+    inp.style.height = '24px';
+    clearAttachedImg();
+    appendBotGuide(buscarGuiaLocal(text));
+  }
+
+  function calcPed(val) {
+    const kg = parseFloat(val);
+    document.querySelectorAll('.calc-val').forEach(el => {
+      const unit = el.getAttribute('data-unit') || '';
+      if (!kg || kg <= 0) {
+        el.textContent = '—';
+        return;
+      }
+      const mult = parseFloat(el.getAttribute('data-mult') || '0');
+      const minV = el.getAttribute('data-min') ? parseFloat(el.getAttribute('data-min')) : null;
+      const maxV = el.getAttribute('data-max') ? parseFloat(el.getAttribute('data-max')) : null;
+
+      let res = kg * mult;
+      if (minV !== null && res < minV) res = minV;
+      if (maxV !== null && res > maxV) res = maxV;
+
+      const formatted = Number.isInteger(res) ? res : res.toFixed(2).replace(/\.?0+$/, '');
+      el.textContent = `${formatted} ${unit}`.trim();
+    });
+  }
+
+  function filterPed(q) {
+    const term = (q || '').toLowerCase().trim();
+    const cards = document.querySelectorAll('#vade-list .p-card');
+    const advTitle = document.getElementById('adv-title');
+
+    if (advTitle) {
+      advTitle.classList.toggle('hidden-card', !term);
+    }
+
+    cards.forEach(card => {
+      const line = card.getAttribute('data-line');
+      const name = (card.getAttribute('data-name') || '').toLowerCase();
+      const text = card.textContent.toLowerCase();
+      if (!term) {
+        card.classList.toggle('hidden-card', line === 'second');
+      } else {
+        const match = name.includes(term) || text.includes(term);
+        card.classList.toggle('hidden-card', !match);
+      }
+    });
+  }
+
+  function toggleVoice() {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const btn = document.getElementById('mic-btn');
+    const inp = document.getElementById('inp');
+    if (!SpeechRec || !btn || !inp) return;
+
+    if (isListening && recognition) {
+      recognition.stop();
+      isListening = false;
+      btn.classList.remove('listening');
+      return;
+    }
+
+    recognition = new SpeechRec();
+    recognition.lang = 'es-ES';
+    recognition.interimResults = false;
+
+    recognition.onresult = function(e) {
+      const transcript = e.results[0][0].transcript || '';
+      inp.value = inp.value ? `${inp.value} ${transcript}` : transcript;
+    };
+
+    recognition.onend = function() {
+      isListening = false;
+      btn.classList.remove('listening');
+    };
+
+    isListening = true;
+    btn.classList.add('listening');
+    recognition.start();
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const inp = document.getElementById('inp');
+    if (inp) {
+      inp.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          doSend();
+        }
+      });
+    }
+  });
+</script>
 </body>
 </html>
-"""
