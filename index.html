@@ -1,13 +1,3 @@
-from pathlib import Path
-
-src_path = Path("/mnt/data/Texto pegado.txt")
-original = src_path.read_text(encoding="utf-8")
-
-# Keep the user's JavaScript intact, removing only the closing document tags
-# so it can be placed inside a correctly structured HTML document.
-script = original.strip()
-script = script.replace("</body>\n</html>", "").replace("</body>\r\n</html>", "").rstrip()
-
 html = """<!DOCTYPE html>
 <html lang="es">
 <head>
